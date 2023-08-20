@@ -1,0 +1,23 @@
+{
+  "name": "wechaty-neko-bot",
+  "version": "1.0.0",
+  "description": "wechaty bot",
+  "main": "main.js",
+  "scripts": {
+    "start": "npx ts-node src/main.ts",
+    "compile": "npx tsc"
+  },
+  "keywords": [],
+  "author": "404E",
+  "devDependencies": {
+    "@types/raven": "^2.5.4",
+    "type-fest": "^4.2.0",
+    "typescript": "^5.1.6"
+  },
+  "dependencies": {
+    "dotenv": "^16.3.1",
+    "qrcode": "^1.5.3",
+    "wechaty": "^1.20.2",
+    "wechaty-puppet-wechat4u": "^1.14.1"
+  }
+}
