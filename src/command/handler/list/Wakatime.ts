@@ -20,19 +20,23 @@ class Wakatime implements CommandHandler {
       command.message.say(this.usage);
       return;
     }
-    let theme = command.props["theme"] ?? "tokyonight"
-    let range = command.props["range"] ?? "7d"
-    let type = command.props["t"]?.toLocaleLowerCase() ?? 'lang';
+    let theme = command.props.get("theme") ?? "tokyonight"
+    let range = command.props.get("range") ?? "7d"
+    let type = command.props.get("t")?.toLocaleLowerCase() ?? 'lang';
     if (type !== 'lang' && type !== 'editor') {
       command.message.say(this.usage);
       return;
     }
+    let id = command.args[0]
     axios.get(
-      `http://127.0.0.1:1179/wakatime/${type}/${command.content}/${range}?theme=${theme}`,
-      {responseType: 'arraybuffer'}
+      `http://127.0.0.1:1179/wakatime/${type}/${id}/${range}?theme=${theme}`,
+      {
+        responseType: 'arraybuffer',
+        validateStatus: (_) => true
+      }
     ).then(resp => {
       if (resp.status != HttpStatusCode.Ok) {
-        command.say(`无效的wakatime用户: ${command.content}`)
+        command.say(`无效的wakatime用户: ${id}`)
         return;
       }
       let file = FileBox.fromBuffer(Buffer.from(resp.data), "file.png");

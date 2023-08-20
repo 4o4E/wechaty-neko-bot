@@ -125,7 +125,7 @@ export class CommandManager {
     let sender = message.talker() as unknown as ContactInterface;
     let command = new Command(message, sender, name, args, props, content);
     // group
-    return message.payload!.roomId ? this.handleGroup(command) : this.handlePrivate(command);
+    return message.room() ? this.handleGroup(command) : this.handlePrivate(command);
   }
 
   /**
