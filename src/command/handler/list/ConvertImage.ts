@@ -1,12 +1,14 @@
-import {CommandHandler} from "../CommandHandler";
+import {CommandHandler, CommandHandlerType} from "../CommandHandler";
 import type {Command} from "../../Command";
 import * as PUPPET from "wechaty-puppet";
 import type {FileBoxInterface} from "file-box";
+import {CommandManager} from "../../manager/CommandManager";
 
-class _ConvertImage extends CommandHandler {
+class ConvertImage implements CommandHandler {
   name = "convert";
   regex = /convert/i;
-  usage = "!convert [回复图片] - 将表情转成图片"
+  usage = "!convert [回复图片] - 将表情转成图片";
+  type = CommandHandlerType.ALL;
 
   onCommand(command: Command): void {
     command.message.toRecalled().then((m) => {
@@ -21,7 +23,7 @@ class _ConvertImage extends CommandHandler {
       }
     })
   }
-
 }
 
-export const ConvertImage = new _ConvertImage();
+const INSTANCE = new ConvertImage();
+CommandManager.register(INSTANCE, INSTANCE.type)

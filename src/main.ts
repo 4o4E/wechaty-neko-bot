@@ -3,9 +3,7 @@ import {Contact, log, Message, ScanStatus, WechatyBuilder} from 'wechaty'
 import QRCode from 'qrcode'
 import fs from 'fs';
 import {MessageManager} from "./MessageManager";
-import {ConvertImage} from "./command/handler/list/ConvertImage";
 import {CommandManager} from "./command/manager/CommandManager";
-import {CommandHandlerType} from "./command/handler/CommandHandler";
 
 function onScan(qrcode: string, status: ScanStatus) {
   log.info('Bot', '扫码状态变更: %s(%s)', ScanStatus[status], status)
@@ -37,9 +35,7 @@ async function onMessage(message: Message) {
   MessageManager.onMessageRecv(message)
 }
 
-CommandManager.register(ConvertImage, CommandHandlerType.all)
-console.log(CommandManager.group.size);
-console.log(CommandManager.private.size);
+CommandManager.scanCommands();
 
 const bot = WechatyBuilder.build({name: 'wechaty-bot'});
 

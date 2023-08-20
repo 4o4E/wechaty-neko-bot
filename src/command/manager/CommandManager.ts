@@ -1,13 +1,46 @@
 import type {CommandHandler} from "../handler/CommandHandler";
 import {CommandHandlerType} from "../handler/CommandHandler";
 import {Command} from "../Command";
-import type {ContactInterface} from "wechaty/src/user-modules/contact";
+import type {ContactInterface} from "wechaty/dist/esm/src/user-modules/contact";
 import fs from "fs";
 import type {Message} from "wechaty";
 import {log} from "wechaty";
 
 const PREFIX = "[COMMAND]"
 
+/**
+ * 指令解析的结果
+ */
+interface ParseResult {
+  /**
+   * 指令前缀
+   */
+  prefix: string,
+  /**
+   * 指令名字
+   */
+  name: string,
+  /**
+   * 指令body开始的下标, body的第一个非空格字符
+   */
+  bodyStart: number,
+  /**
+   * 指令参数
+   */
+  args: Array<string>,
+  /**
+   * 指令参数`-aaa=bbb`
+   */
+  props: Map<string, string>,
+  /**
+   * 指令正文(完整body)
+   */
+  content: string
+}
+
+/**
+ * 指令管理器
+ */
 export class CommandManager {
   /**
    * 所有已注册的群聊指令处理器
@@ -20,32 +53,34 @@ export class CommandManager {
 
   static register(handler: CommandHandler, type: CommandHandlerType) {
     switch (type) {
-      case CommandHandlerType.group:
+      case CommandHandlerType.GROUP:
         this.group.add(handler);
         break;
-      case CommandHandlerType.private:
+      case CommandHandlerType.PRIVATE:
         this.private.add(handler);
         break;
-      case CommandHandlerType.all:
+      case CommandHandlerType.ALL:
         this.group.add(handler);
         this.private.add(handler);
         break;
     }
   }
 
+  /**
+   * 自动从`command/handler/list`文件夹下扫描指令js并执行
+   */
   static scanCommands() {
-    fs.readdir(`${process.cwd()}/src/command/handler/list`, (err, names) => {
+    fs.readdir(`${process.cwd()}/dist/command/handler/list`, (err, names) => {
       if (err !== null) {
         console.error(err);
         return;
       }
-      console.log(names);
       names
-        .filter((name) => name.endsWith(".ts"))
-        .map((name) => `${process.cwd()}/command/handler/list/${name.substring(0, name.indexOf(".ts"))}`)
-        .map((path) => require(path).default)
+        .filter((name) => name.endsWith(".js"))
+        .map((name) => `${process.cwd()}/dist/command/handler/list/${name.substring(0, name.indexOf(".js"))}`)
+        .map((path) => require(path));
+      log.info(PREFIX, `注册私聊指令${this.private.size}条, 群聊指令${this.group.size}条`);
     });
-    log.info(PREFIX, `注册私聊指令${this.private.size}条, 群聊指令${this.group.size}条`);
   }
 
   /**
@@ -56,8 +91,8 @@ export class CommandManager {
   static handlePrivate(command: Command): boolean {
     log.info(PREFIX, "recv private: %s", command.toString())
     for (const handler of this.private) {
-      if (!handler.match(command)) continue;
-      handler.onCommand(command)
+      if (!handler.regex.test(command.name)) continue;
+      handler.onCommand(command);
       return true;
     }
     return false;
@@ -71,8 +106,8 @@ export class CommandManager {
   static handleGroup(command: Command): boolean {
     log.info(PREFIX, "recv group: %s", command.toString())
     for (const handler of this.group) {
-      if (!handler.match(command)) continue;
-      handler.onCommand(command)
+      if (!handler.regex.test(command.name)) continue;
+      handler.onCommand(command);
       return true;
     }
     return false;
@@ -85,27 +120,36 @@ export class CommandManager {
    */
   static handleMessageAsCommand(message: Message): boolean {
     let commandInfo = this.parseToCommand(message);
-    if (!commandInfo) return false
-    let {name, args, props} = commandInfo;
+    if (!commandInfo) return false;
+    let {name, args, props, content} = commandInfo;
     let sender = message.talker() as unknown as ContactInterface;
-    let command = new Command(message, sender, name, args, props);
+    let command = new Command(message, sender, name, args, props, content);
     // group
     return message.payload!.roomId ? this.handleGroup(command) : this.handlePrivate(command);
   }
 
-  static parseToCommand(message: Message): { name: string, args: string[], props: Map<string, string> } | null {
+  /**
+   * 尝试将消息解析为指令
+   * @param message 消息
+   * @return 若不是指令则返回null
+   */
+  static parseToCommand(message: Message): ParseResult | null {
     let text = message.text();
-    let result = {
+    let result: ParseResult = {
       prefix: "",
       name: "",
       bodyStart: NaN,
       args: new Array<string>(),
       props: new Map<string, string>(),
+      content: ""
     }
 
     let index = {i: 0}
 
     if (!this.parseHeader(text, index, result)) return null;
+    // 跳过开头全角空格
+    while (text.charAt(index.i).isBlank()) index.i++;
+    result.content = text.substring(index.i, text.length);
     this.parseBody(text, index, result);
     return result;
   }
@@ -118,19 +162,11 @@ export class CommandManager {
    * @param _result 指令解析的结果
    * @return 若解析成功则返回true
    */
-  private static parseHeader(
-    text: string,
-    index: { i: number },
-    _result: { prefix: string, name: string, bodyStart: number, args: string[], props: Map<string, string> }
-  ): boolean {
-    // 跳过开头全角空格
-    while (text.charAt(index.i).isBlank()) {
-      index.i++;
-    }
+  private static parseHeader(text: string, index: { i: number }, _result: ParseResult): boolean {
     // 非指令
     if (text.charAt(index.i) !== '!' && text.charAt(index.i) != '！') return false;
     // 指令头
-    let start = index.i
+    let start = index.i;
     while (index.i < text.length && !text.charAt(index.i).isBlank()) index.i++;
     // 缺失name
     if (start == index.i) return false;
@@ -140,11 +176,14 @@ export class CommandManager {
     return true;
   }
 
-  private static parseBody(
-    text: string,
-    index: { i: number },
-    _result: { prefix: string, name: string, bodyStart: number, args: string[], props: Map<string, string> }
-  ) {
+  /**
+   * 解析指令
+   *
+   * @param text 指令文本
+   * @param index 记录解析下标的对象
+   * @param _result 指令解析的结果
+   */
+  private static parseBody(text: string, index: { i: number }, _result: ParseResult) {
     // 使用数组作为cache, 最终使用join("")
     let cache = {
       argument: new Array<string>(),
@@ -170,7 +209,6 @@ export class CommandManager {
       }
     }
     const space = () => {
-      console.log(ParseStatus[status.status]);
       switch (status.status) {
         case ParseStatus.ARGUMENT:
           _result.args.push(cache.argument.join(''))
@@ -206,13 +244,13 @@ export class CommandManager {
       const push = () => {
         switch (status.status) {
           case ParseStatus.ARGUMENT:
-            cache.argument.push(c)
+            cache.argument.push(c);
             return;
           case ParseStatus.KEY:
-            cache.key.push(c)
+            cache.key.push(c);
             return;
           case ParseStatus.VALUE:
-            cache.value.push(c)
+            cache.value.push(c);
             return;
         }
       };
@@ -220,8 +258,17 @@ export class CommandManager {
       // 先处理转义
       if (status.escape) {
         status.escape = false;
-        if (c === 'n') current()?.push('\n')
-        if (c === '\\') current()?.push('\\\\')
+        switch (c) {
+          case 'n':
+            current()?.push('\n');
+            break;
+          case '\\':
+            current()?.push('\\\\');
+            break;
+          default:
+            current()?.push(c)
+            break;
+        }
       }
       // 若进入转义
       if (c === '\\') {
@@ -269,7 +316,7 @@ export class CommandManager {
       push();
     }
     // 收尾
-    space()
+    space();
   }
 }
 

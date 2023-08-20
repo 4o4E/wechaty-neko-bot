@@ -4,18 +4,21 @@
   "description": "wechaty bot",
   "main": "main.js",
   "scripts": {
-    "start": "npx ts-node src/main.ts",
+    "start": "node dist/main.js",
     "compile": "npx tsc"
   },
   "keywords": [],
   "author": "404E",
   "devDependencies": {
+    "aws-sdk": "^2.1440.0",
+    "etcd3": "^1.1.2",
     "@types/raven": "^2.5.4",
     "type-fest": "^4.2.0",
     "typescript": "^5.1.6"
   },
   "dependencies": {
-    "dotenv": "^16.3.1",
+    "axios": "^1.4.0",
+    "file-box": "^1.5.5",
     "qrcode": "^1.5.3",
     "wechaty": "^1.20.2",
     "wechaty-puppet-wechat4u": "^1.14.1"
