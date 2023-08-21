@@ -1,9 +1,12 @@
 import {Contact, log, Message, ScanStatus, WechatyBuilder} from 'wechaty'
-
 import QRCode from 'qrcode'
 import fs from 'fs';
 import {MessageManager} from "./MessageManager";
 import {CommandManager} from "./command/manager/CommandManager";
+
+export const workingDir = process.env.NEKO_BOT_DIR
+  ? `${process.cwd()}/${process.env.NEKO_BOT_DIR}`
+  : `${process.cwd()}/run`;
 
 export const start = new Date();
 
