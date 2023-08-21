@@ -29,7 +29,7 @@ class ConvertImage implements CommandHandler {
             validateStatus: (_) => true
           }).then(resp => {
             if (resp.status != HttpStatusCode.Ok) {
-              command.say(`获取失败: ${url}`)
+              command.say(`获取失败: ${url}`);
               return;
             }
             let file = FileBox.fromBuffer(Buffer.from(resp.data), "file.png");
@@ -43,19 +43,8 @@ class ConvertImage implements CommandHandler {
         return false;
       }
     }, command.message.room() != undefined);
-    // command.message.toRecalled().then((m) => {
-    //   if (m === undefined) {
-    //     command.sender.say(this.usage)
-    //     return;
-    //   }
-    //   if (m.type() === PUPPET.types.Message.Emoticon) {
-    //     m.toImage().artwork().then((value: FileBoxInterface) => {
-    //       command.message.say(value)
-    //     })
-    //   }
-    // })
   }
 }
 
 const INSTANCE = new ConvertImage();
-CommandManager.register(INSTANCE, INSTANCE.type)
+CommandManager.register(INSTANCE, INSTANCE.type);
