@@ -21,9 +21,8 @@ class ConvertImage implements CommandHandler {
       callback: (message: Message): boolean => {
         if (message.type() === PUPPET.types.Message.Emoticon) {
           let text: string = message.payload.text;
-          let url = text.split('cdnurl = "')[1]
-            .split('"')[0]
-            .replace(/&amp;amp;/g, "&");
+          let exec = /cdnurl\s*=\s*"(?<url>.*?)"/.exec(text);
+          let url = exec.groups["url"].replace(/&amp;amp;/g, "&");
           axios.get(url, {
             responseType: 'arraybuffer',
             validateStatus: (_) => true
