@@ -5,6 +5,8 @@ import fs from 'fs';
 import {MessageManager} from "./MessageManager";
 import {CommandManager} from "./command/manager/CommandManager";
 
+export const start = new Date();
+
 function onScan(qrcode: string, status: ScanStatus) {
   log.info('Bot', '扫码状态变更: %s(%s)', ScanStatus[status], status);
   // 完成扫码后删除二维码文件
