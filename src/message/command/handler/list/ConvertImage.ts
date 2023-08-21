@@ -1,9 +1,9 @@
-import {CommandHandler, CommandHandlerType} from "../CommandHandler";
-import type {Command} from "../../Command";
+import {CommandHandler, CommandHandlerType} from "@/message/command/handler/CommandHandler";
+import type {Command} from "@/message/command/Command";
 import * as PUPPET from "wechaty-puppet";
 import {FileBox} from "file-box";
-import {CommandManager} from "../../manager/CommandManager";
-import {MessageManager} from "../../../MessageManager";
+import {CommandManager} from "@/message/command/manager/CommandManager";
+import {MessageManager} from "@/message/MessageManager";
 import {Message} from "wechaty";
 import axios, {HttpStatusCode} from "axios";
 

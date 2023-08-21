@@ -1,4 +1,4 @@
-import {CommandManager} from "./command/manager/CommandManager";
+import {CommandManager} from "@/message/command/manager/CommandManager";
 import {log, Message} from "wechaty";
 import * as PUPPET from "wechaty-puppet";
 
@@ -68,5 +68,6 @@ const CALLBACK_VALID = 3 * 60 * 1000
 export abstract class Callback {
   abstract sign: string
   abstract time: number
+
   abstract callback(message: Message): boolean
 }

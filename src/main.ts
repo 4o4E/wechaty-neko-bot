@@ -1,8 +1,8 @@
 import {Contact, log, Message, ScanStatus, WechatyBuilder} from 'wechaty'
 import QRCode from 'qrcode'
 import fs from 'fs';
-import {MessageManager} from "./MessageManager";
-import {CommandManager} from "./command/manager/CommandManager";
+import {MessageManager} from "@/message/MessageManager";
+import {CommandManager} from "@/message/command/manager/CommandManager";
 
 export const workingDir = process.env.NEKO_BOT_DIR
   ? `${process.cwd()}/${process.env.NEKO_BOT_DIR}`
@@ -40,7 +40,7 @@ async function onMessage(message: Message) {
 
 CommandManager.scanCommands();
 
-const bot = WechatyBuilder.build({name: 'wechaty-bot'});
+export const bot = WechatyBuilder.build({name: 'wechaty-bot'});
 
 bot.on('scan', onScan)
   .on('login', onLogin)

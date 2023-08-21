@@ -1,8 +1,8 @@
 import axios, {AxiosRequestConfig} from "axios";
-import {SingleImageApiTemplate} from "../../template/ImageApiTemplate";
-import {CommandHandlerType} from "../../CommandHandler";
-import {Command} from "../../../Command";
-import {CommandManager} from "../../../manager/CommandManager";
+import {SingleImageApiTemplate} from "@/message/command/handler/template/ImageApiTemplate";
+import {CommandHandlerType} from "@/message/command/handler/CommandHandler";
+import {Command} from "@/message/command/Command";
+import {CommandManager} from "@/message/command/manager/CommandManager";
 
 class Bird extends SingleImageApiTemplate {
   name = "Bird";

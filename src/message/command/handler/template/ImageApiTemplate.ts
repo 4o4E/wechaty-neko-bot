@@ -1,5 +1,5 @@
-import {CommandHandler, CommandHandlerType} from "../CommandHandler";
-import type {Command} from "../../Command";
+import {CommandHandler, CommandHandlerType} from "@/message/command/handler/CommandHandler";
+import type {Command} from "@/message/command/Command";
 import axios, {AxiosRequestConfig, HttpStatusCode} from "axios";
 import {FileBox} from "file-box";
 

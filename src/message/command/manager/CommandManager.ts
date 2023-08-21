@@ -1,6 +1,6 @@
-import type {CommandHandler} from "../handler/CommandHandler";
-import {CommandHandlerType} from "../handler/CommandHandler";
-import {Command} from "../Command";
+import type {CommandHandler} from "@/message/command/handler/CommandHandler";
+import {CommandHandlerType} from "@/message/command/handler/CommandHandler";
+import {Command} from "@/message/command/Command";
 import type {ContactInterface} from "wechaty/dist/esm/src/user-modules/contact";
 import fs from "fs";
 import type {Message} from "wechaty";

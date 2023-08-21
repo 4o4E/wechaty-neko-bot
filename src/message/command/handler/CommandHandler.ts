@@ -1,4 +1,4 @@
-import type {Command} from "../Command";
+import type {Command} from "@/message/command/Command";
 
 /**
  * 指令处理器
