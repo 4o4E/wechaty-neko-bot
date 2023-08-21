@@ -70,17 +70,23 @@ export class CommandManager {
    * 自动从`command/handler/list`文件夹下扫描指令js并执行
    */
   static scanCommands() {
-    fs.readdir(`${process.cwd()}/dist/command/handler/list`, (err, names) => {
-      if (err !== null) {
-        console.error(err);
-        return;
-      }
-      names
-        .filter((name) => name.endsWith(".js"))
-        .map((name) => `${process.cwd()}/dist/command/handler/list/${name.substring(0, name.indexOf(".js"))}`)
-        .map((path) => require(path));
-      log.info(PREFIX, `注册私聊指令${this.private.size}条, 群聊指令${this.group.size}条`);
-    });
+    this.handleFile(`${process.cwd()}/dist/command/handler/list`);
+    log.info(PREFIX, `注册私聊指令${this.private.size}条, 群聊指令${this.group.size}条`);
+  }
+
+  private static handleFile(file: string) {
+    let stats = fs.lstatSync(file);
+    if (stats.isDirectory()) {
+      fs.readdirSync(file)
+        .forEach(name => this.handleFile(`${file}/${name}`));
+      return;
+    }
+    if (file.endsWith(".js")) {
+      log.verbose(PREFIX, "执行匹配的文件: %s", file);
+      require(file);
+      return;
+    }
+    log.verbose(PREFIX, "跳过不匹配的文件: %s", file);
   }
 
   /**
@@ -208,6 +214,7 @@ export class CommandManager {
           return null;
       }
     }
+
     const space = () => {
       switch (status.status) {
         case ParseStatus.ARGUMENT:
