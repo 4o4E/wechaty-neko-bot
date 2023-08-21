@@ -6,7 +6,7 @@ import fs from "fs";
 import type {Message} from "wechaty";
 import {log} from "wechaty";
 
-const PREFIX = "[COMMAND]"
+const PREFIX = "[CommandManager]"
 
 /**
  * 指令解析的结果
