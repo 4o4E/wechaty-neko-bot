@@ -20,8 +20,8 @@ class Wakatime implements CommandHandler {
       command.message.say(this.usage);
       return;
     }
-    let theme = command.props.get("theme") ?? "tokyonight"
-    let range = command.props.get("range") ?? "7d"
+    let theme = command.props.get("theme") ?? "tokyonight";
+    let range = command.props.get("range") ?? "7d";
     let type = command.props.get("t")?.toLocaleLowerCase() ?? 'lang';
     if (type !== 'lang' && type !== 'editor') {
       command.message.say(this.usage);
@@ -36,7 +36,7 @@ class Wakatime implements CommandHandler {
       }
     ).then(resp => {
       if (resp.status != HttpStatusCode.Ok) {
-        command.say(`无效的wakatime用户: ${id}`)
+        command.say(`无效的wakatime用户: ${id}`);
         return;
       }
       let file = FileBox.fromBuffer(Buffer.from(resp.data), "file.png");
@@ -46,4 +46,4 @@ class Wakatime implements CommandHandler {
 }
 
 const INSTANCE = new Wakatime();
-CommandManager.register(INSTANCE, INSTANCE.type)
+CommandManager.register(INSTANCE, INSTANCE.type);
