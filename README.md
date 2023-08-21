@@ -2,16 +2,22 @@
 
 一个微信机器人
 
-## script
+## 使用
+
+### windows
 
 ```shell
-# 编译(必要时手动删除dist文件夹)
-npm run compile
+cd run
+run
+```
 
-# 运行(需要先编译)
-npm run start
+### linux
+```shell
+cd run
+chmod +x start.sh
+./start.sh
 ```
 
 ## 指令
 
-指令的ts文件放在`./src/command/handler/list`下, 并在代码中直接注册, 启动时会自动扫描执行
+指令的ts文件放在`./src/command/handler/list`下, 并在代码中直接注册, 启动时会自动扫描执行, 支持嵌套文件夹

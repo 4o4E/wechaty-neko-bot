@@ -3,10 +3,6 @@
   "version": "1.0.0",
   "description": "wechaty bot",
   "main": "main.js",
-  "scripts": {
-    "start": "node dist/main.js",
-    "compile": "npx tsc"
-  },
   "keywords": [],
   "author": "404E",
   "devDependencies": {
