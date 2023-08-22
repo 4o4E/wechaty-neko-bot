@@ -14,10 +14,9 @@ run
 ### linux
 ```shell
 cd run
-chmod +x start.sh
-./start.sh
+./run.sh
 ```
 
 ## 指令
 
-指令的ts文件放在`./src/command/handler/list`下, 并在代码中直接注册, 启动时会自动扫描执行, 支持嵌套文件夹
+指令的ts文件放在`./src/message/command/handler/list`下, 并在代码中直接注册, 启动时会自动扫描执行, 支持文件夹嵌套
