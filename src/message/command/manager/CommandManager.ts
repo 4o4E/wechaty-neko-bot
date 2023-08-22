@@ -70,7 +70,7 @@ export class CommandManager {
    * 自动从`command/handler/list`文件夹下扫描指令js并执行
    */
   static scanCommands() {
-    this.handleFile(`${process.cwd()}/dist/command/handler/list`);
+    this.handleFile(`${process.cwd()}/dist/message/command/handler/list`);
     log.info(PREFIX, `注册私聊指令${this.private.size}条, 群聊指令${this.group.size}条`);
   }
 

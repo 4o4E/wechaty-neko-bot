@@ -1,3 +1,6 @@
+// 防止@路径被编译进js
+require("module-alias/register");
+
 import {Contact, log, Message, ScanStatus, WechatyBuilder} from 'wechaty'
 import QRCode from 'qrcode'
 import fs from 'fs';
