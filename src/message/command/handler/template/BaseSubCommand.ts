@@ -14,10 +14,14 @@ export abstract class BaseSubCommand implements CommandHandler {
    * 所有的子指令处理器
    */
   abstract sub: Array<SubHandler>;
-  abstract currentUsage: string;
+  /**
+   * 该指令的用法
+   */
+  currentUsage: string | null = null;
+
   get usage(): string {
     let strings = this.sub.map(s => s.usage);
-    strings.unshift(this.currentUsage);
+    if (this.currentUsage) strings.unshift(this.currentUsage);
     return strings.join("\n");
   }
 

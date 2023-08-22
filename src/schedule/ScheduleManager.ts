@@ -22,7 +22,7 @@ class _ScheduleManager extends BaseConfig<Array<ScheduleTask>> {
   }
 
   /**
-   * 添加一个task
+   * 添加task
    *
    * @param task 任务, cron表达式需要在调用此方法之前就进行校验
    * @return 若成功添加则返回true
@@ -38,6 +38,7 @@ class _ScheduleManager extends BaseConfig<Array<ScheduleTask>> {
 
   /**
    * 删除task
+   *
    * @param name task名字
    * @return 若成功删除则返回true
    */
@@ -48,6 +49,18 @@ class _ScheduleManager extends BaseConfig<Array<ScheduleTask>> {
     scheduleJob.job.cancel();
     this.scheduleSave();
     return true;
+  }
+
+  /**
+   * 列出task
+   *
+   * @param contentId 会话id
+   * @return 若成功删除则返回true
+   */
+  listTask(contentId: string): ScheduleTask[] {
+    return Array.from(this.tasks.values())
+      .filter(task => task.task.name.startsWith(contentId))
+      .map(task => task.task);
   }
 
   beforeLoad() {
@@ -70,7 +83,7 @@ export const ScheduleManager = new _ScheduleManager();
 /**
  * 计划任务的信息, 需要序列化成json保存在本地
  */
-class ScheduleTask {
+export class ScheduleTask {
   /**
    * 任务名字, 使用 `会话id.任务名字` 的格式
    */
@@ -82,7 +95,7 @@ class ScheduleTask {
   /**
    * 执行次数
    */
-  count: number;
+  count = 0;
   /**
    * 任务的类型
    */
@@ -92,34 +105,35 @@ class ScheduleTask {
    */
   data: ScheduleTaskData;
 
+  constructor(name: string, cron: string, type: ScheduleTaskType, data: ScheduleTaskData) {
+    this.name = name;
+    this.cron = cron;
+    this.type = type;
+    this.data = data;
+  }
+
   getTask(): () => Promise<void> {
+    /// 未来可能会有更多的type以及对应的处理方式
     switch (this.type) {
+      case ScheduleTaskType.SEND_PRIVATE_MESSAGE:
       case ScheduleTaskType.SEND_GROUP_MESSAGE: {
-        let data = this.data as SendGroupMessageData;
+        let data = this.data as SendMessageData;
         return async () => {
           this.count++;
-          let room = await bot.Contact.find({id: data.groupId});
+          let room = await bot.Contact.find({id: data.contactId});
           if (!room) {
-            bot.log.warn("[Schedule]", `无法找到id为${data.groupId}的群聊`);
+            bot.log.warn("[Schedule]", `无法找到id为${data.contactId}的群聊`);
             return;
           }
           room.say(data.content);
         }
       }
-      case ScheduleTaskType.SEND_PRIVATE_MESSAGE: {
-        let data = this.data as SendPrivateMessageData;
-        return async () => {
-          this.count++;
-          let contact = await bot.Contact.find({id: data.userId});
-          if (!contact) {
-            bot.log.warn("[Schedule]", `无法找到id为${data.userId}的联系人`);
-            return;
-          }
-          contact.say(data.content);
-        }
-      }
     }
   }
+}
+
+export type {
+  ScheduleJob,
 }
 
 /**
@@ -135,21 +149,21 @@ class ScheduleJob {
   }
 }
 
-enum ScheduleTaskType {
+export enum ScheduleTaskType {
   SEND_GROUP_MESSAGE,
   SEND_PRIVATE_MESSAGE,
 }
 
-class SendGroupMessageData {
-  groupId: string
+export class SendMessageData {
+  contactId: string
   content: string
+
+  constructor(contactId: string, content: string) {
+    this.contactId = contactId;
+    this.content = content;
+  }
 }
 
-class SendPrivateMessageData {
-  userId: string
-  content: string
-}
 
-type ScheduleTaskData =
-  | SendGroupMessageData
-  | SendPrivateMessageData
+export type ScheduleTaskData =
+  | SendMessageData
