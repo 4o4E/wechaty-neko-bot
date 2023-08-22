@@ -11,6 +11,7 @@ export abstract class SingleImageApiTemplate implements CommandHandler {
   abstract regex: RegExp;
   abstract usage: string;
   abstract type: CommandHandlerType;
+  abstract permission: string[];
 
   /**
    * 构造请求

@@ -23,7 +23,7 @@ export abstract class CommandHandler {
   /**
    * 执行该处理器所需要的权限
    */
-  abstract permission: Array<string>;
+  abstract permission: string[];
 
   /**
    * 处理指令
