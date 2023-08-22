@@ -10,7 +10,6 @@ class Cron extends BaseSubCommand {
   regex = /cron/i;
   type = CommandHandlerType.ALL;
   permission = ["command.use.Cron"];
-  usage = this.generateUsage();
   sub: SubHandler[] = [
     new class extends SubHandler {
       name = "add";
@@ -85,6 +84,7 @@ class Cron extends BaseSubCommand {
       }
     },
   ];
+  usage = this.generateUsage();
 }
 
 const INSTANCE = new Cron();
