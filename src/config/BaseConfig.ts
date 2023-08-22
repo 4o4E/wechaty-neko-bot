@@ -83,8 +83,6 @@ export abstract class BaseConfig<T extends any> {
 
   /**
    * 异步保存
-   *
-   * @param callback 回调
    */
   saveAsync() {
     this.beforeSave();
