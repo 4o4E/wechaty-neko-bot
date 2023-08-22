@@ -15,15 +15,13 @@ export abstract class BaseSubCommand extends CommandHandler {
    */
   currentUsage: string | null = null;
 
-  usage = "";
-
   /**
-   * 更新usage, 在构造完类之后调用, 避免变量在构造函数之前进行初始化而读不到sub
+   * 生成usage, 在子类中手动调用, 避免生成usage时sub还未定义
    */
-  updateUsage() {
+  generateUsage(): string {
     let strings = this.sub.map(s => s.usage);
     if (this.currentUsage) strings.unshift(this.currentUsage);
-    this.usage = strings.join("\n");
+    return strings.join("\n");
   }
 
   onCommand(command: Command): void {
@@ -49,11 +47,6 @@ export abstract class BaseSubCommand extends CommandHandler {
    */
   currentOnCommand(command: Command): void {
     command.say(this.usage);
-  }
-
-  constructor() {
-    super();
-    this.updateUsage();
   }
 }
 

@@ -10,12 +10,14 @@ class Cron extends BaseSubCommand {
   regex = /cron/i;
   type = CommandHandlerType.ALL;
   permission = ["command.use.Cron"];
+  usage = this.generateUsage();
   sub: SubHandler[] = [
     new class extends SubHandler {
       name = "add";
       permission = ["command.use.Cron.add"];
       regex = /add/i;
       currentUsage = "!cron add <id> <corn> <消息> - 添加一条定时发送的消息, id不可重复"
+      usage = this.generateUsage();
 
       onSubCommand(command: Command, arg: string, args: string[]) {
         if (args.length != 3) {
@@ -45,6 +47,7 @@ class Cron extends BaseSubCommand {
       permission = ["command.use.Cron.del"];
       regex = /del/i;
       currentUsage = "!cron del <id> - 删除一条定时消息"
+      usage = this.generateUsage();
 
       onSubCommand(command: Command, arg: string, args: string[]) {
         if (args.length != 1) {
@@ -65,6 +68,7 @@ class Cron extends BaseSubCommand {
       permission = ["command.use.Cron.list"];
       regex = /list/i;
       currentUsage = "!cron list - 列出所有定时消息"
+      usage = this.generateUsage();
 
       onSubCommand(command: Command, arg: string, args: string[]) {
         if (args.length != 0) {
