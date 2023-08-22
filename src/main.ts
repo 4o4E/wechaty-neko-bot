@@ -3,6 +3,7 @@ import QRCode from 'qrcode'
 import fs from 'fs';
 import {MessageManager} from "@/message/MessageManager";
 import {CommandManager} from "@/message/command/manager/CommandManager";
+import {ScheduleManager} from "@/schedule/ScheduleManager";
 
 export const workingDir = process.env.NEKO_BOT_DIR
   ? `${process.cwd()}/${process.env.NEKO_BOT_DIR}`
@@ -47,5 +48,8 @@ bot.on('scan', onScan)
   .on('logout', onLogout)
   .on('message', onMessage)
   .start()
-  .then(() => log.info('Bot', 'Done.'))
+  .then(() => {
+    log.info('Bot', 'Done.');
+    ScheduleManager.load();
+  })
   .catch(e => log.error('Bot', e));
