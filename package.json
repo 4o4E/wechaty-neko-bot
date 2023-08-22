@@ -6,6 +6,7 @@
   "keywords": [],
   "author": "404E",
   "devDependencies": {
+    "@types/node-schedule": "^2.1.0",
     "@types/qrcode": "^1.5.1",
     "@types/raven": "^2.5.4",
     "aws-sdk": "^2.1440.0",
