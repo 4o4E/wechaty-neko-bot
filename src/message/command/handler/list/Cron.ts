@@ -80,7 +80,7 @@ class Cron extends BaseSubCommand {
           .listTask(room ? room.id : talker.id)
           .map(task => `${task.name.substring(task.name.indexOf(".") + 1)}: ${task.data.content}`)
           .join("\n");
-        command.say(taskInfo)
+        command.say(taskInfo.isBlank() ? "当前还未定义定时消息" : taskInfo)
       }
     },
   ];
