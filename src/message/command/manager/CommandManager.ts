@@ -286,7 +286,7 @@ export class CommandManager {
       // 原始模式
       if (status.origin) {
         // 退出
-        if (c === '"' && next().isBlank()) {
+        if (c === '"' && (next().isBlank() || i === text.length - 1)) {
           status.origin = false;
           continue;
         }
