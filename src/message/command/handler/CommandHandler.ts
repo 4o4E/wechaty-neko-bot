@@ -20,6 +20,10 @@ export abstract class CommandHandler {
    * 处理器类型
    */
   abstract type: CommandHandlerType;
+  /**
+   * 执行该处理器所需要的权限
+   */
+  abstract permission: Array<string>;
 
   /**
    * 处理指令

@@ -9,6 +9,7 @@ class Dog extends SingleImageApiTemplate {
   regex = /dog/i;
   usage = "!dog - 获取一张🐕";
   type = CommandHandlerType.ALL;
+  permission = ["command.use.Dog"];
 
   async query(command: Command): Promise<{ url: string; config: AxiosRequestConfig }> {
     let resp = await axios.get("https://shibe.online/api/shibes");

@@ -9,6 +9,7 @@ class Lazy extends SingleImageApiTemplate {
   regex = /lazy|moyu|摸鱼/i;
   usage = "!fox - 获取摸鱼日历";
   type = CommandHandlerType.ALL;
+  permission = ["command.use.Lazy"];
 
   async query(command: Command): Promise<{ url: string; config: AxiosRequestConfig }> {
     return {

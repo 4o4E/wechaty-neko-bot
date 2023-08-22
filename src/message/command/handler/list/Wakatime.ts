@@ -14,6 +14,7 @@ class Wakatime implements CommandHandler {
   -t=lang // 可选 lang, editor
 可用主题: https://github.com/4o4E/github-readme-stats-render/blob/master/http-server-win/src/main/resources/config.yml`;
   type = CommandHandlerType.ALL;
+  permission = ["command.use.Wakatime"];
 
   onCommand(command: Command): void {
     if (command.args.length != 1) {
@@ -23,7 +24,7 @@ class Wakatime implements CommandHandler {
     let theme = command.props.get("theme") ?? "tokyonight";
     let range = command.props.get("range") ?? "7d";
     let type = command.props.get("t")?.toLocaleLowerCase() ?? 'lang';
-    if (type !== 'lang' && type !== 'editor') {
+    if (type != 'lang' && type != 'editor') {
       command.message.say(this.usage);
       return;
     }

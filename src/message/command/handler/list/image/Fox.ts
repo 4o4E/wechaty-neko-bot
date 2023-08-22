@@ -9,6 +9,7 @@ class Fox extends SingleImageApiTemplate {
   regex = /fox/i;
   usage = "!fox - 获取一张🦊";
   type = CommandHandlerType.ALL;
+  permission = ["command.use.Fox"];
 
   cache = new Array<string>();
 

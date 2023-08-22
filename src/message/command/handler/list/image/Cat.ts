@@ -9,6 +9,7 @@ class Cat extends SingleImageApiTemplate {
   regex = /cat/i;
   usage = "!cat - 获取一张🐱";
   type = CommandHandlerType.ALL;
+  permission = ["command.use.Cat"];
 
   async query(command: Command): Promise<{ url: string; config: AxiosRequestConfig }> {
     let resp = await axios.get("https://api.thecatapi.com/v1/images/search");

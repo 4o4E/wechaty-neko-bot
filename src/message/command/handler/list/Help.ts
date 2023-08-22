@@ -8,6 +8,7 @@ class Help implements CommandHandler {
   usage = `!help - 查看所有指令(暂不支持)
 !help [指令] - 查看指令`;
   type = CommandHandlerType.ALL;
+  permission = new Array<string>();
 
   onCommand(command: Command): void {
     if (command.args.length == 0) {

@@ -12,6 +12,7 @@ class ConvertImage implements CommandHandler {
   regex = /convert/i;
   usage = "!convert - 将表情转成图片";
   type = CommandHandlerType.ALL;
+  permission = ["command.use.ConvertImage"];
 
   onCommand(command: Command): void {
     command.say("请在3分钟内发送表情");

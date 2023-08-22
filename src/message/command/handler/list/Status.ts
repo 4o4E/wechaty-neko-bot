@@ -5,9 +5,10 @@ import {start} from "@/main";
 
 class Status implements CommandHandler {
   name = "Status";
-  regex = /status/i;
+  regex = /status|e/i;
   usage = "!status - 查看机器人统计信息";
   type = CommandHandlerType.ALL;
+  permission = ["command.use.Status"];
 
   onCommand(command: Command): void {
     let mem = process.memoryUsage();

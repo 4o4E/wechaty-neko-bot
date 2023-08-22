@@ -9,6 +9,7 @@ class Bird extends SingleImageApiTemplate {
   regex = /bird/i;
   usage = "!bird - 获取一张🕊";
   type = CommandHandlerType.ALL;
+  permission = ["command.use.Bird"];
 
   async query(command: Command): Promise<{ url: string; config: AxiosRequestConfig }> {
     let resp = await axios.get("https://v2.yiff.rest/animals/birb?notes=disabled", {
