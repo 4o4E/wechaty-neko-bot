@@ -17,8 +17,7 @@ class _ScheduleManager extends BaseConfig<Array<ScheduleTask>> {
    * @param cron 表达式
    */
   checkCron(cron: string): boolean {
-    let result = parseString(cron);
-    return result.errors.size === 0;
+    return Object.keys(parseString(cron).errors).length === 0;
   }
 
   /**
