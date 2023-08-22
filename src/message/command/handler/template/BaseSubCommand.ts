@@ -19,11 +19,11 @@ export abstract class BaseSubCommand implements CommandHandler {
    */
   currentUsage: string | null = null;
 
-  get usage(): string {
+  usage: string = (() => {
     let strings = this.sub.map(s => s.usage);
     if (this.currentUsage) strings.unshift(this.currentUsage);
     return strings.join("\n");
-  }
+  })()
 
   onCommand(command: Command): void {
     if (command.args.length == 0) {
