@@ -33,7 +33,3 @@ export interface Placeholder {
 }
 
 export const Lang = new _Lang();
-
-function a() {
-  let v = Lang["aaa"];
-}
