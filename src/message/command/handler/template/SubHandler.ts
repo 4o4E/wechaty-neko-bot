@@ -12,7 +12,7 @@ export abstract class SubHandler {
   currentUsage: string | null = null;
 
   /**
-   * 生成usage, 在子类中手动调用, 避免生成usage时sub还未定义
+   * 生成usage, 在子类中手动调用, **调用必须在定义sub之后**
    */
   generateUsage(): string {
     let strings = this.sub.map(s => s.usage);
