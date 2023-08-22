@@ -1,4 +1,4 @@
-import {CommandHandler, CommandHandlerType} from "@/message/command/handler/CommandHandler";
+import {CommandHandler} from "@/message/command/handler/CommandHandler";
 import type {Command} from "@/message/command/Command";
 import {SubHandler} from "@/message/command/handler/template/SubHandler";
 
@@ -9,17 +9,22 @@ export abstract class BaseSubCommand extends CommandHandler {
   /**
    * 所有的子指令处理器
    */
-  abstract sub: Array<SubHandler>;
+  abstract sub: SubHandler[];
   /**
    * 该指令的用法
    */
   currentUsage: string | null = null;
 
-  usage: string = (() => {
+  usage = "";
+
+  /**
+   * 更新usage, 在构造完类之后调用, 避免变量在构造函数之前进行初始化而读不到sub
+   */
+  updateUsage() {
     let strings = this.sub.map(s => s.usage);
     if (this.currentUsage) strings.unshift(this.currentUsage);
-    return strings.join("\n");
-  })()
+    this.usage = strings.join("\n");
+  }
 
   onCommand(command: Command): void {
     if (command.args.length === 0) {
@@ -30,10 +35,11 @@ export abstract class BaseSubCommand extends CommandHandler {
     let arg = args.shift();
     for (let handler of this.sub) {
       if (handler.regex.test(arg)) {
-        handler
+        handler.onSubCommand(command, arg, args);
         return;
       }
     }
+    this.currentOnCommand(command);
   }
 
   /**
@@ -43,6 +49,11 @@ export abstract class BaseSubCommand extends CommandHandler {
    */
   currentOnCommand(command: Command): void {
     command.say(this.usage);
+  }
+
+  constructor() {
+    super();
+    this.updateUsage();
   }
 }
 
