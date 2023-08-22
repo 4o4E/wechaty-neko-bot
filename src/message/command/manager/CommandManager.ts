@@ -175,7 +175,7 @@ export class CommandManager {
     let start = index.i;
     while (index.i < text.length && !text.charAt(index.i).isBlank()) index.i++;
     // 缺失name
-    if (start == index.i) return false;
+    if (start === index.i) return false;
     _result.bodyStart = index.i;
     _result.prefix = text.charAt(start);
     _result.name = text.substring(start + 1, index.i - start);

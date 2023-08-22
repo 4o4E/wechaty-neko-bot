@@ -11,7 +11,7 @@ class Help implements CommandHandler {
   permission = new Array<string>();
 
   onCommand(command: Command): void {
-    if (command.args.length == 0) {
+    if (command.args.length === 0) {
       command.say(this.usage);
       return;
     }

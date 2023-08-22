@@ -35,7 +35,7 @@ export abstract class SingleImageApiTemplate implements CommandHandler {
       }
       let url = resp.request.res.responseUrl as string;
       let name = url.substring(url.lastIndexOf("/") + 1);
-      if (name.indexOf(".") == -1) name = `${name}.png`;
+      if (name.indexOf(".") === -1) name = `${name}.png`;
       let file = FileBox.fromBuffer(
         Buffer.from(resp.data),
         name
