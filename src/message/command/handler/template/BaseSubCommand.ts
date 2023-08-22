@@ -5,11 +5,7 @@ import {SubHandler} from "@/message/command/handler/template/SubHandler";
 /**
  * 有多级嵌套子指令的指令模板
  */
-export abstract class BaseSubCommand implements CommandHandler {
-  abstract name: string;
-  abstract regex: RegExp;
-  abstract type: CommandHandlerType;
-  abstract permission: Array<string>;
+export abstract class BaseSubCommand extends CommandHandler {
   /**
    * 所有的子指令处理器
    */
@@ -26,7 +22,7 @@ export abstract class BaseSubCommand implements CommandHandler {
   })()
 
   onCommand(command: Command): void {
-    if (command.args.length == 0) {
+    if (command.args.length === 0) {
       this.currentOnCommand(command);
       return;
     }
