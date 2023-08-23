@@ -19,7 +19,7 @@ class Cron extends BaseSubCommand {
 cron表达式参考 https://github.com/node-schedule/node-schedule`
       usage = this.generateUsage();
 
-      onSubCommand(command: Command, arg: string, args: string[]) {
+      onSubCommand(command: Command, _arg: string, args: string[]) {
         if (args.length != 3) {
           command.say(this.currentUsage);
           return
@@ -49,7 +49,7 @@ cron表达式参考 https://github.com/node-schedule/node-schedule`
       currentUsage = "!cron del <id> - 删除一条定时消息"
       usage = this.generateUsage();
 
-      onSubCommand(command: Command, arg: string, args: string[]) {
+      onSubCommand(command: Command, _arg: string, args: string[]) {
         if (args.length != 1) {
           command.say(this.currentUsage);
           return
@@ -70,7 +70,7 @@ cron表达式参考 https://github.com/node-schedule/node-schedule`
       currentUsage = "!cron list - 列出所有定时消息"
       usage = this.generateUsage();
 
-      onSubCommand(command: Command, arg: string, args: string[]) {
+      onSubCommand(command: Command, _arg: string, args: string[]) {
         if (args.length != 0) {
           command.say(this.currentUsage);
           return
