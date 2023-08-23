@@ -15,7 +15,8 @@ class Cron extends BaseSubCommand {
       name = "add";
       permission = ["command.use.Cron.add"];
       regex = /add/i;
-      currentUsage = "!cron add <id> <corn> <消息> - 添加一条定时发送的消息, id不可重复"
+      currentUsage = `!cron add <id> <corn> <消息> - 添加一条定时发送的消息, id不可重复
+cron表达式参考 https://github.com/node-schedule/node-schedule`
       usage = this.generateUsage();
 
       onSubCommand(command: Command, arg: string, args: string[]) {
