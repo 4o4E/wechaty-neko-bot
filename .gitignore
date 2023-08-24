@@ -6,3 +6,4 @@ qr.png
 run/*
 !run/run.cmd
 !run/run.sh
+!run/start.sh
