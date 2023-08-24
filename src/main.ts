@@ -9,6 +9,7 @@ import fs from 'fs';
 import {MessageManager} from "@/message/MessageManager";
 import {CommandManager} from "@/message/command/CommandManager";
 import {ScheduleManager} from "@/schedule/ScheduleManager";
+import {PermissionManager} from "@/permission/PermissionManager";
 
 export const workingDir = process.cwd();
 
@@ -45,7 +46,6 @@ async function onMessage(message: Message) {
 CommandManager.scanCommands();
 
 export const bot = WechatyBuilder.build({name: 'wechaty-bot'});
-ScheduleManager.load();
 
 bot.on('scan', onScan)
   .on('login', onLogin)
@@ -55,5 +55,6 @@ bot.on('scan', onScan)
   .then(() => {
     log.info('Bot', 'Done.');
     ScheduleManager.load();
+    PermissionManager.load();
   })
   .catch(e => log.error('Bot', e));

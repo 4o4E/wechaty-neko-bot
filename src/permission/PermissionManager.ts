@@ -1,10 +1,15 @@
 import fs from "fs";
+import {deserializeToTree, PermissionTree, serializeFromTree,} from "@/permission/types";
+import * as path from "path";
+import {mkdirs, safeWrite} from "@/util/path";
+import {Savable} from "@/config/Savable";
 
 /**
  * # 存储结构
  *
- * data文件夹下每个文件保存一个权限容器的内容, `default.json` 保存默认权限的内容(代码中定义的权限节点不在 `default.json`
- * 中)
+ * data文件夹下每个文件保存一个权限容器的内容, `default.json` 保存默认权限的内容(代码中定义的权限节点不在 `default.json` 中)
+ * - 权限组的文件以id命名, 通配符用-代替
+ * - 自定义权限组命名正则 `[^\/*?:"<>]`
  *
  * ```plaintext
  * permission
@@ -25,7 +30,7 @@ import fs from "fs";
  * |---|---|
  * | 用户权限节点 | `.{userId}` |
  * | 群聊权限节点 | `{groupId}.{userId}` |
- * | 权限组权限节点 | 自定义 |
+ * | 权限组权限节点 | 自定义(名字不可带有特殊符号) |
  *
  * 包含
  *
@@ -60,139 +65,49 @@ import fs from "fs";
  * - 获取所有匹配的权限树
  * - 递归遍历权限树及其继承的权限树找出所有匹配权限节点名字的
  * - 从所有匹配的选项中找出优先级最高的
+ *
+ * ### 权限节点匹配
+ *
+ * - 会匹配父节点的通配符(a.b.c会匹配a.*), 但是最终以距离最近的进行计算
+ * - 通配符`.*`仅在权限节点名字的最后时有用, 在其他情况下不会特殊处理
  */
-class PermissionManager {
-  dirPath = "config/permission";
-  defaultPath = `${this.dirPath}/default.json`;
-  dataDir = `${this.dirPath}/data`;
-  content: PermissionStorage;
+class _PermissionManager extends Savable {
+  dirPath = `config${path.sep}permission`;
+  defaultPath = `${this.dirPath}${path.sep}default.json`;
+  dataDir = `${this.dirPath}${path.sep}data`;
 
-  defaultPermission: DefaultPermissionStorage;
-  contactPermission: Map<string, PermissionValue>
+  defaultPermission: PermissionTree;
+  contactPermission: { [key: string]: PermissionTree } = {}
 
   saveDefault() {
-    fs.mkdirSync(this.dirPath);
-    fs.mkdirSync(this.dataDir);
+    mkdirs(this.dataDir);
     if (!fs.existsSync(this.defaultPath)) fs.writeFileSync(this.defaultPath, "{}");
   }
 
   load() {
-    this.defaultPermission = JSON.parse(fs.readFileSync(this.defaultPath).toString("utf8"));
+    this.saveDefault();
+    this.defaultPermission = deserializeToTree(JSON.parse(fs.readFileSync(this.defaultPath).toString("utf8")));
     fs.readdirSync(this.dataDir).forEach(name => {
-      let container: PermissionContainer = JSON.parse(fs.readFileSync(`${this.dataDir}/${name}`).toString('utf8'));
-    })
+      if (!name.endsWith(".json")) return;
+      let tree = deserializeToTree(JSON.parse(fs.readFileSync(`${this.dataDir}${path.sep}${name}`).toString('utf8')));
+      this.contactPermission[tree.name] = tree;
+    });
+  }
+
+  save() {
+    safeWrite(this.defaultPath, JSON.stringify(serializeFromTree(this.defaultPermission)));
+    let written = new Array<string>()
+    for (let key in this.contactPermission) {
+      let tree = this.contactPermission[key];
+      written.unshift(`${tree.name}.json`)
+      safeWrite(`${this.dataDir}${path.sep}${tree.name}.json`, JSON.stringify(serializeFromTree(this.defaultPermission)));
+    }
+    // 删除未被写入的.json文件
+    fs.readdirSync(this.dataDir).forEach(file => {
+      if (written.includes(file) || file.endsWith(".json")) return;
+      fs.unlinkSync(`${this.dataDir}${path.sep}${file}`);
+    });
   }
 }
 
-/// 存储结构
-
-export class DefaultPermissionStorage {
-  [key: string]: PermissionValue
-}
-
-/**
- * 储存的权限格式
- */
-export class PermissionStorage {
-  /**
-   * 保存的默认权限
-   */
-  default: Map<string, PermissionValue>;
-  /**
-   * 所有会话的权限
-   */
-  contact: ContactStorage;
-}
-
-export class ContactStorage {
-  /**
-   * 存储的会话权限, key: 用户id/群id, value: 权限实体
-   */
-  [props: string]: PermissionContainer
-}
-
-/**
- * 权限容器, 容器是一棵权限树的序列化版本
- */
-export class PermissionContainer {
-  /**
-   * 该容器的名字
-   */
-  name: string
-  /**
-   * 该容器中的权限节点
-   */
-  values: PermissionValues;
-  /**
-   * 该容器继承的权限组
-   */
-  parents: string[];
-}
-
-export class PermissionValues {
-  /**
-   * 存储的权限, key: 权限节点名字, value: 权限值
-   */
-  [props: string]: PermissionValue
-}
-
-type PermissionValue =
-  | "true" // 允许
-  | "false" // 拒绝
-  | "admin" // 管理可执行
-  | null // 未定义
-
-/// 运行结构
-
-/**
- * 运行时, 权限节点将会被拆分成对象, 若该节点是根节点, 则 `name` 代表这棵权限树是归属于哪个
- */
-export class PermissionNode {
-  /**
-   * 本级权限节点的名字
-   */
-  name: string;
-  /**
-   * 本级权限节点的值
-   */
-  value: PermissionValue | null;
-  /**
-   * 本级权限节点的权重
-   */
-  weight: number | null;
-  /**
-   * `本级权限.*` 的值
-   */
-  wildcard: PermissionValue | null;
-  /**
-   * 所有的子节点
-   */
-  nodes = new Map<string, PermissionNode>();
-
-  constructor(
-    name: string,
-    value: PermissionValue | null = null,
-    weight: number | null = null,
-    wildcard: PermissionValue | null = null,
-    nodes: Map<string, PermissionNode> = new Map<string, PermissionNode>()
-  ) {
-    this.name = name;
-    this.value = value;
-    this.weight = weight;
-    this.wildcard = wildcard;
-    this.nodes = nodes;
-  }
-
-  getOrBuild(name: string) {
-    let exists = this.nodes.get(name);
-    if (exists) return exists;
-
-    let node = new PermissionNode(name);
-    this.nodes.set(name, node);
-    return node;
-  }
-}
-
-export function buildPermissionTree(data: PermissionContainer) {
-
-}
+export const PermissionManager = new _PermissionManager();
