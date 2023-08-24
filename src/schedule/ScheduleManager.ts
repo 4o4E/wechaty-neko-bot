@@ -62,7 +62,7 @@ class _ScheduleManager extends BaseConfig<Array<ScheduleTask>> {
       .map(task => task.task);
   }
 
-  beforeLoad() {
+  override beforeLoad() {
     // 清空已有的
     this.tasks.forEach(job => job.job.cancel());
     this.tasks.clear();
