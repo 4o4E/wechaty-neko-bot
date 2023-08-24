@@ -1,8 +1,7 @@
-import {CommandManager} from "@/message/command/manager/CommandManager";
-import {log, Message} from "wechaty";
+import {CommandManager} from "@/message/command/CommandManager";
+import {Message} from "wechaty";
 import * as PUPPET from "wechaty-puppet";
-
-export let debug = {value: false};
+import {debug} from "@/util/log";
 
 /**
  * 消息处理器
@@ -17,7 +16,6 @@ export class MessageManager {
    * @param message 消息
    */
   static onMessageRecv(message: Message): void {
-    debug.value && log.info("bot", "recv message: [%s] %s", PUPPET.types.Message[message.type()], message.text());
     if (this.handleCallback(message)) return;
     if (message.type() === PUPPET.types.Message.Text && CommandManager.handleMessageAsCommand(message)) return;
     this.handleNotCommandMessage(message);
@@ -61,7 +59,7 @@ export class MessageManager {
    */
   private static handleNotCommandMessage(message: Message) {
     if (message.type() === PUPPET.types.Message.Unknown) return
-    debug.value && log.info("bot", "unhandled message: [%s] %s", PUPPET.types.Message[message.type()], message.text())
+    debug("unhandled message: [%s] %s", PUPPET.types.Message[message.type()], message.text())
   }
 }
 

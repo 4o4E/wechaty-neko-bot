@@ -5,7 +5,7 @@ import {Contact, log, Message, ScanStatus, WechatyBuilder} from 'wechaty'
 import QRCode from 'qrcode'
 import fs from 'fs';
 import {MessageManager} from "@/message/MessageManager";
-import {CommandManager} from "@/message/command/manager/CommandManager";
+import {CommandManager} from "@/message/command/CommandManager";
 import {ScheduleManager} from "@/schedule/ScheduleManager";
 
 export const workingDir = process.env.NEKO_BOT_DIR

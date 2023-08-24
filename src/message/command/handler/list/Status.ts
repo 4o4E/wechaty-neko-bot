@@ -1,6 +1,6 @@
 import {CommandHandler, CommandHandlerType} from "@/message/command/handler/CommandHandler";
 import type {Command} from "@/message/command/Command";
-import {CommandManager} from "@/message/command/manager/CommandManager";
+import {CommandManager} from "@/message/command/CommandManager";
 import {start} from "@/main";
 
 class Status implements CommandHandler {

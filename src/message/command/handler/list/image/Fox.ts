@@ -2,7 +2,7 @@ import axios, {AxiosRequestConfig} from "axios";
 import {SingleImageApiTemplate} from "@/message/command/handler/template/ImageApiTemplate";
 import {CommandHandlerType} from "@/message/command/handler/CommandHandler";
 import {Command} from "@/message/command/Command";
-import {CommandManager} from "@/message/command/manager/CommandManager";
+import {CommandManager} from "@/message/command/CommandManager";
 
 class Fox extends SingleImageApiTemplate {
   name = "Fox";

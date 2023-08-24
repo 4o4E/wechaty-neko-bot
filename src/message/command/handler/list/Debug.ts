@@ -1,7 +1,7 @@
 import {CommandHandler, CommandHandlerType} from "@/message/command/handler/CommandHandler";
 import type {Command} from "@/message/command/Command";
-import {CommandManager} from "@/message/command/manager/CommandManager";
-import {debug} from "@/message/MessageManager";
+import {CommandManager} from "@/message/command/CommandManager";
+import {enableDebug, switchDebug} from "@/util/log";
 
 class Debug implements CommandHandler {
   name = "Debug";
@@ -11,8 +11,8 @@ class Debug implements CommandHandler {
   permission = new Array<string>();
 
   onCommand(command: Command): void {
-    debug.value = !debug.value;
-    command.say(debug.value ? "已开启debug" : "已关闭debug");
+    switchDebug();
+    command.say(enableDebug ? "已开启debug" : "已关闭debug");
   }
 }
 

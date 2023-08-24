@@ -1,6 +1,6 @@
 import {CommandHandlerType} from "@/message/command/handler/CommandHandler";
 import type {Command} from "@/message/command/Command";
-import {CommandManager} from "@/message/command/manager/CommandManager";
+import {CommandManager} from "@/message/command/CommandManager";
 import {ScheduleManager, ScheduleTask, ScheduleTaskType, SendMessageData} from "@/schedule/ScheduleManager";
 import {BaseSubCommand} from "@/message/command/handler/template/BaseSubCommand";
 import {SubHandler} from "@/message/command/handler/template/SubHandler";
