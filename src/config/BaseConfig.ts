@@ -61,7 +61,7 @@ export abstract class BaseConfig<T extends any> {
    */
   saveDefault() {
     if (fs.existsSync(this.filePath)) return false;
-    this.saveAsync();
+    this.save();
     return true;
   }
 
