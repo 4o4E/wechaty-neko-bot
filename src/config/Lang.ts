@@ -1,7 +1,8 @@
 import {BaseConfig} from "@/config/BaseConfig";
+import * as path from "path";
 
 class _Lang extends BaseConfig<Map<string, string>> {
-  filePath = "config/lang.json";
+  filePath = `config${path.sep}lang.json`;
   content = new Map<string, string>();
 
   get(path: string, ...args: Placeholder[]): string {

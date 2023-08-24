@@ -1,4 +1,6 @@
 // 防止@路径被编译进js
+import * as path from "path";
+
 require("module-alias/register");
 
 import {Contact, log, Message, ScanStatus, WechatyBuilder} from 'wechaty'
@@ -8,9 +10,7 @@ import {MessageManager} from "@/message/MessageManager";
 import {CommandManager} from "@/message/command/CommandManager";
 import {ScheduleManager} from "@/schedule/ScheduleManager";
 
-export const workingDir = process.env.NEKO_BOT_DIR
-  ? `${process.cwd()}/${process.env.NEKO_BOT_DIR}`
-  : `${process.cwd()}/run`;
+export const workingDir = process.cwd();
 
 export const start = new Date();
 
@@ -24,7 +24,7 @@ function onScan(qrcode: string, status: ScanStatus) {
   // 生成二维码
   if (status === ScanStatus.Waiting || status === ScanStatus.Timeout) {
     QRCode.toFile("qr.png", qrcode, {type: 'png'}, err => err && log.error('bot', err));
-    log.info('Bot', `等待扫码 - ${process.cwd()}/qr.png`);
+    log.info('Bot', `等待扫码 - ${process.cwd()}${path.sep}qr.png`);
     log.info('Bot', 'onScan: %s(%s) - %s', ScanStatus[status], status, qrcode);
   }
 }
@@ -45,6 +45,7 @@ async function onMessage(message: Message) {
 CommandManager.scanCommands();
 
 export const bot = WechatyBuilder.build({name: 'wechaty-bot'});
+ScheduleManager.load();
 
 bot.on('scan', onScan)
   .on('login', onLogin)

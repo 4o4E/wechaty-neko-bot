@@ -1,5 +1,6 @@
 import fs from "fs";
 import {debug} from "@/util/log";
+import {safeWrite} from "@/util/path";
 
 /**
  * 配置文件基类
@@ -85,7 +86,7 @@ export abstract class BaseConfig<T extends any> {
   save() {
     this.beforeSave();
     let json = JSON.stringify(this.content);
-    fs.writeFileSync(this.filePath, json, {encoding: "utf8"});
+    safeWrite(this.filePath, json);
     this.afterSave();
   }
 

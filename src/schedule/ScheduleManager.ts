@@ -2,12 +2,13 @@ import schedule from "node-schedule";
 import {parseString} from "cron-parser";
 import {bot} from "@/main";
 import {BaseConfig} from "@/config/BaseConfig";
+import * as path from "path";
 
 /**
  * 定时任务管理器
  */
 class _ScheduleManager extends BaseConfig<Array<ScheduleTask>> {
-  override filePath = "config/schedule.json"
+  override filePath = `config${path.sep}schedule.json`
   override content = new Array<ScheduleTask>();
   private tasks = new Map<string, ScheduleJob>();
 
