@@ -1,11 +1,12 @@
 import fs from "fs";
 import {debug} from "@/util/log";
 import {safeWrite} from "@/util/path";
+import {Savable} from "@/config/Savable";
 
 /**
  * 配置文件基类
  */
-export abstract class BaseConfig<T extends any> {
+export abstract class BaseConfig<T extends any> extends Savable {
   /**
    * 文件路径
    */
@@ -14,8 +15,6 @@ export abstract class BaseConfig<T extends any> {
    * 内容
    */
   abstract content: T;
-
-  private saveTask: NodeJS.Timeout | null;
 
   /**
    * load之前执行
@@ -42,22 +41,6 @@ export abstract class BaseConfig<T extends any> {
   }
 
   /**
-   * 计划保存, 当有保存task时忽略, task完成后触发的计划保存会触发task
-   */
-  scheduleSave() {
-    if (this.saveTask != null && this.saveTask.hasRef()) {
-      debug("已有保存任务存在, 忽略保存请求")
-      return
-    }
-    debug("触发保存任务, 将在3分钟后保存")
-    this.saveTask = setTimeout(() => {
-      this.saveTask = null;
-      debug("开始保存任务")
-      this.saveAsync();
-    }, 3 * 60 * 1000)
-  }
-
-  /**
    * 保存默认配置文件
    */
   saveDefault() {
@@ -69,33 +52,24 @@ export abstract class BaseConfig<T extends any> {
   /**
    * save之前执行
    */
-  beforeSave() {
+  override beforeSave() {
     debug("触发%s保存", this.filePath)
   }
 
   /**
    * save之后执行
    */
-  afterSave() {
+  override afterSave() {
     debug("完成%s保存", this.filePath)
   }
 
   /**
    * 保存当前数据至文件
    */
-  save() {
+  override save() {
     this.beforeSave();
     let json = JSON.stringify(this.content);
     safeWrite(this.filePath, json);
     this.afterSave();
-  }
-
-  /**
-   * 异步保存
-   */
-  saveAsync() {
-    this.beforeSave();
-    let json = JSON.stringify(this.content);
-    fs.writeFile(this.filePath, json, {encoding: "utf8"}, this.afterSave);
   }
 }
