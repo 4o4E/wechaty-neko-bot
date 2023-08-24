@@ -2,8 +2,8 @@ import {BaseConfig} from "@/config/BaseConfig";
 import * as path from "path";
 
 class _Lang extends BaseConfig<Map<string, string>> {
-  filePath = `config${path.sep}lang.json`;
-  content = new Map<string, string>();
+  override filePath = `config${path.sep}lang.json`;
+  override content = new Map<string, string>();
 
   get(path: string, ...args: Placeholder[]): string {
     let value = this.content.get(path);
