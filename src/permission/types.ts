@@ -32,6 +32,31 @@ export type PermissionValue =
   | "admin" // 管理可执行
   | null // 未定义
 
+/**
+ * 默认指定群中所有成员的权限(`xxx.*`)权重
+ */
+export const DEFAULT_ALL_MEMBER_IN_GROUP_WEIGHT = 100
+
+/**
+ * 默认指定用户在所有群的权限(`*.xxx`)权重
+ */
+export const DEFAULT_MEMBER_IN_ALL_GROUP_WEIGHT = 10
+
+/**
+ * 默认`*.*`权重
+ */
+export const DEFAULT_ALL_GROUP_WILDCARD_WEIGHT = 1
+
+/**
+ * 默认权限节点(`xxx.xxx`)权重
+ */
+export const DEFAULT_NODE_WEIGHT = 10
+
+/**
+ * 默认通配符权限节点(`xxx.*`)权重
+ */
+export const DEFAULT_WILDCARD_WEIGHT = 1
+
 /// 运行结构
 
 /**
@@ -49,16 +74,25 @@ export class PermissionTree {
   /**
    * 权限组的权重
    */
-  weight: number | null;
+  weight: number;
   /**
    * 所有的子节点
    */
-  root: PermissionNode;
+  node: PermissionNode;
 
-  constructor(name: string, parents: string[], weight: number | null) {
+  constructor(name: string, parents: string[], weight: number) {
     this.name = name;
     this.parents = parents;
     this.weight = weight;
+  }
+
+  getOrBuild(name: string[]): PermissionNode {
+    return this.node.get(name, this);
+  }
+
+  getAllMatches(perm: string, matches: Set<PermissionNode>): void {
+    let split = perm.split(".");
+    this.node.collect(split, matches);
   }
 }
 
@@ -91,23 +125,30 @@ export class PermissionNode {
    */
   parent!: PermissionNode;
   /**
+   * 根节点引用
+   */
+  root!: PermissionTree;
+  /**
    * 所有的子节点
    */
   nodes: { [key: string]: PermissionNode } = {};
 
   constructor(
     name: string,
-    parent: PermissionNode
+    parent: PermissionNode,
+    root: PermissionTree
   ) {
     this.name = name;
     this.parent = parent;
+    this.root = root;
   }
 
   /**
    * 设置权限节点的信息
    * @param name 节点名字
+   * @param tree 属于的权限树
    */
-  get(name: string[]): PermissionNode {
+  get(name: string[], tree: PermissionTree): PermissionNode {
     // 最终节点
     if (name.length === 0) {
       return this;
@@ -115,18 +156,32 @@ export class PermissionNode {
 
     // 有后续节点
     let first = name.shift();
-    return this.getOrBuild(first).get(name);
+    return this.getOrBuild(first, tree).get(name, tree);
   }
 
   /**
    * 获取子节点, 当子节点不存在时创建新的
    *
    * @param name 子节点名字
+   * @param tree 属于的权限树
    */
-  getOrBuild(name: string): PermissionNode {
+  getOrBuild(name: string, tree: PermissionTree): PermissionNode {
     let exists = this.nodes[name];
     if (exists) return exists;
-    return this.nodes[name] = new PermissionNode(name, this);
+    return this.nodes[name] = new PermissionNode(name, this, tree);
+  }
+
+  collect(split: string[], matches: Set<PermissionNode>) {
+    // 到此结束
+    if (split.length === 0) {
+      if (this.value) matches.add(this);
+      return;
+    }
+    // 父节点通配符
+    if (split.length > 1 && this.wildcard !== null) matches.add(this.wildcard);
+
+    // 传递给匹配的子节点
+    this.nodes[split.shift()].collect(split, matches);
   }
 }
 
@@ -135,7 +190,7 @@ export function deserializeToTree(data: PermissionContainer): PermissionTree {
   let tree = new PermissionTree(name, parents, weight);
   for (let path in values) {
     let {value, weight} = values[path]
-    let node = tree.root.get(path.split("."));
+    let node = tree.getOrBuild(path.split("."));
     if (node.name === "*") node.parent.wildcard = node;
     node.path = path;
     node.value = value;
@@ -146,7 +201,7 @@ export function deserializeToTree(data: PermissionContainer): PermissionTree {
 
 export function serializeFromTree(tree: PermissionTree): PermissionContainer {
   let data = new PermissionContainer(tree.name, tree.parents, tree.weight);
-  visitNode(tree.root, (node: PermissionNode) => {
+  visitNode(tree.node, (node: PermissionNode) => {
     data.values[node.path] = {weight: node.weight, value: node.value};
   });
   return data;

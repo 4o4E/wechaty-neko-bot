@@ -1,5 +1,5 @@
 import fs from "fs";
-import {deserializeToTree, PermissionTree, serializeFromTree,} from "@/permission/types";
+import {deserializeToTree, PermissionNode, PermissionTree, serializeFromTree,} from "@/permission/types";
 import * as path from "path";
 import {mkdirs, safeWrite} from "@/util/path";
 import {Savable} from "@/config/Savable";
@@ -73,20 +73,20 @@ import {Savable} from "@/config/Savable";
  */
 class _PermissionManager extends Savable {
   dirPath = `config${path.sep}permission`;
-  defaultPath = `${this.dirPath}${path.sep}default.json`;
   dataDir = `${this.dirPath}${path.sep}data`;
 
-  defaultPermission: PermissionTree;
+  /**
+   * 内置的权限注册, 代码注册的权限由此对象管理
+   */
+  internalPermission = new PermissionTree("_internal", [], -1);
   contactPermission: { [key: string]: PermissionTree } = {}
 
   saveDefault() {
     mkdirs(this.dataDir);
-    if (!fs.existsSync(this.defaultPath)) fs.writeFileSync(this.defaultPath, "{}");
   }
 
   load() {
     this.saveDefault();
-    this.defaultPermission = deserializeToTree(JSON.parse(fs.readFileSync(this.defaultPath).toString("utf8")));
     fs.readdirSync(this.dataDir).forEach(name => {
       if (!name.endsWith(".json")) return;
       let tree = deserializeToTree(JSON.parse(fs.readFileSync(`${this.dataDir}${path.sep}${name}`).toString('utf8')));
@@ -95,18 +95,40 @@ class _PermissionManager extends Savable {
   }
 
   save() {
-    safeWrite(this.defaultPath, JSON.stringify(serializeFromTree(this.defaultPermission)));
     let written = new Array<string>()
     for (let key in this.contactPermission) {
       let tree = this.contactPermission[key];
       written.unshift(`${tree.name}.json`)
-      safeWrite(`${this.dataDir}${path.sep}${tree.name}.json`, JSON.stringify(serializeFromTree(this.defaultPermission)));
+      safeWrite(`${this.dataDir}${path.sep}${tree.name}.json`, JSON.stringify(serializeFromTree(tree)));
     }
     // 删除未被写入的.json文件
     fs.readdirSync(this.dataDir).forEach(file => {
       if (written.includes(file) || file.endsWith(".json")) return;
       fs.unlinkSync(`${this.dataDir}${path.sep}${file}`);
     });
+  }
+
+  hasPerm(roomId: string | null, userId: string, permission: string) {
+    let matches = ["*.*", `*.${userId}`, `${roomId}.*`, `${roomId}.${userId}`];
+  }
+
+  hasPermInGroup(roomId: string, userId: string, perm: string) {
+    let allMatches = new Set<PermissionNode>();
+    this.internalPermission.getAllMatches(perm, allMatches);
+    ["*.*", `*.${userId}`, `${roomId}.*`, `${roomId}.${userId}`].map(name => {
+      this.contactPermission[name]?.getAllMatches(perm, allMatches);
+    });
+    let array = Array.from(allMatches);
+
+    array.sort((a,b) => {
+      if (a.root.weight !== b.root.weight) return a.root.weight - b.root.weight;
+      return a.weight - b.weight;
+    });
+
+  }
+
+  hasPermInPrivate(roomId: string, userId: string, permission: string) {
+    let matches = ["*.*", `*.${userId}`, `${roomId}.${userId}`];
   }
 }
 
