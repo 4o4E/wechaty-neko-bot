@@ -1,4 +1,4 @@
-import {CommandHandler, CommandHandlerType} from "@/message/command/handler/CommandHandler";
+import {CommandHandler, CommandType} from "@/message/command/handler/CommandHandler";
 import type {Command} from "@/message/command/Command";
 import {CommandManager} from "@/message/command/CommandManager";
 import axios, {HttpStatusCode} from "axios";
@@ -13,7 +13,7 @@ class Wakatime implements CommandHandler {
   -range=7d // 指定范围, 可选 7d, 30d, 6m, y(1年), a(全部)
   -t=lang // 可选 lang, editor
 可用主题: https://github.com/4o4E/github-readme-stats-render/blob/master/http-server-win/src/main/resources/config.yml`;
-  type = CommandHandlerType.ALL;
+  type = CommandType.ROOM_AND_PRIVATE;
   permission = ["command.use.Wakatime"];
 
   onCommand(command: Command): void {

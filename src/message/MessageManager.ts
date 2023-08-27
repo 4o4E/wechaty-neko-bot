@@ -59,7 +59,7 @@ export class MessageManager {
    */
   private static handleNotCommandMessage(message: Message) {
     if (message.type() === PUPPET.types.Message.Unknown) return
-    debug("unhandled message: [%s] %s", PUPPET.types.Message[message.type()], message.text())
+    debug(() => `unhandled message: [${PUPPET.types.Message[message.type()]}] ${message.text()}`)
   }
 }
 

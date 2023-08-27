@@ -1,12 +1,12 @@
 import {BaseConfig} from "@/config/BaseConfig";
 import * as path from "path";
 
-class _Lang extends BaseConfig<Map<string, string>> {
+class _Lang extends BaseConfig<{ [key: string]: string }> {
   override filePath = `config${path.sep}lang.json`;
-  override content = new Map<string, string>();
+  override content: { [key: string]: string } = {};
 
   get(path: string, ...args: Placeholder[]): string {
-    let value = this.content.get(path);
+    let value = this.content[path];
     if (!value) return path;
     for (let pair of args) {
       let {first, second} = pair;
@@ -32,5 +32,7 @@ export interface Placeholder {
   readonly first: string;
   readonly second: string | number | null;
 }
+
+
 
 export const Lang = new _Lang();

@@ -1,5 +1,5 @@
 import type {CommandHandler} from "@/message/command/handler/CommandHandler";
-import {CommandHandlerType} from "@/message/command/handler/CommandHandler";
+import {CommandType} from "@/message/command/handler/CommandHandler";
 import {Command} from "@/message/command/Command";
 import type {ContactInterface} from "wechaty/dist/esm/src/user-modules/contact";
 import fs from "fs";
@@ -51,15 +51,15 @@ export class CommandManager {
    */
   static private: Set<CommandHandler> = new Set;
 
-  static register(handler: CommandHandler, type: CommandHandlerType) {
-    switch (type) {
-      case CommandHandlerType.GROUP:
+  static register(handler: CommandHandler) {
+    switch (handler.type) {
+      case CommandType.ROOM:
         this.group.add(handler);
         break;
-      case CommandHandlerType.PRIVATE:
+      case CommandType.PRIVATE:
         this.private.add(handler);
         break;
-      case CommandHandlerType.ALL:
+      case CommandType.ROOM_AND_PRIVATE:
         this.group.add(handler);
         this.private.add(handler);
         break;
@@ -98,7 +98,7 @@ export class CommandManager {
     log.info(PREFIX, "recv private: %s", command.toString())
     for (const handler of this.private) {
       if (!handler.regex.test(command.name)) continue;
-      handler.onCommand(command);
+      handler.onCommand(command, command.name, Array.from(command.args));
       return true;
     }
     return false;
@@ -113,7 +113,7 @@ export class CommandManager {
     log.info(PREFIX, "recv group: %s", command.toString())
     for (const handler of this.group) {
       if (!handler.regex.test(command.name)) continue;
-      handler.onCommand(command);
+      handler.onCommand(command, command.name, Array.from(command.args));
       return true;
     }
     return false;

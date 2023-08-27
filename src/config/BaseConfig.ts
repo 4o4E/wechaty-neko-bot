@@ -53,14 +53,14 @@ export abstract class BaseConfig<T extends any> extends Savable {
    * save之前执行
    */
   override beforeSave() {
-    debug("触发%s保存", this.filePath)
+    debug(() => `触发${this.filePath}保存`)
   }
 
   /**
    * save之后执行
    */
   override afterSave() {
-    debug("完成%s保存", this.filePath)
+    debug(() => `完成${this.filePath}保存` )
   }
 
   /**

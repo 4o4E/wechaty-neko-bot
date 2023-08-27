@@ -1,4 +1,4 @@
-import {CommandHandler, CommandHandlerType} from "@/message/command/handler/CommandHandler";
+import {CommandHandler, CommandType} from "@/message/command/handler/CommandHandler";
 import type {Command} from "@/message/command/Command";
 import {CommandManager} from "@/message/command/CommandManager";
 
@@ -7,7 +7,7 @@ class Help implements CommandHandler {
   regex = /help|h|帮助/i;
   usage = `!help - 查看所有指令(暂不支持)
 !help [指令] - 查看指令`;
-  type = CommandHandlerType.ALL;
+  type = CommandType.ROOM_AND_PRIVATE;
   permission = new Array<string>();
 
   onCommand(command: Command): void {

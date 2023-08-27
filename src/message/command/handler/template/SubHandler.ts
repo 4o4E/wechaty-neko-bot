@@ -1,4 +1,5 @@
 import {Command} from "@/message/command/Command";
+import {BaseSubCommand} from "@/message/command/handler/template/BaseSubCommand";
 
 /**
  * 常规的子指令
@@ -10,6 +11,13 @@ export abstract class SubHandler {
   abstract usage: string;
   sub: SubHandler[] = [];
   currentUsage: string | null = null;
+  parent: SubHandler | BaseSubCommand = null;
+
+  constructor() {
+    for (let handler of this.sub) {
+      handler.parent = this;
+    }
+  }
 
   /**
    * 生成usage, 在子类中手动调用, **调用必须在定义sub之后**

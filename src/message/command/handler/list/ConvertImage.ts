@@ -1,4 +1,4 @@
-import {CommandHandler, CommandHandlerType} from "@/message/command/handler/CommandHandler";
+import {CommandHandler, CommandType} from "@/message/command/handler/CommandHandler";
 import type {Command} from "@/message/command/Command";
 import * as PUPPET from "wechaty-puppet";
 import {FileBox} from "file-box";
@@ -11,7 +11,7 @@ class ConvertImage implements CommandHandler {
   name = "convert";
   regex = /convert/i;
   usage = "!convert - 将表情转成图片";
-  type = CommandHandlerType.ALL;
+  type = CommandType.ROOM_AND_PRIVATE;
   permission = ["command.use.ConvertImage"];
 
   onCommand(command: Command): void {

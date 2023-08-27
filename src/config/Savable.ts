@@ -16,10 +16,10 @@ export abstract class Savable {
    */
   scheduleSave() {
     if (this.saveTask != null && this.saveTask.hasRef()) {
-      debug("已有保存任务存在, 忽略保存请求")
+      debug(() => "已有保存任务存在, 忽略保存请求")
       return
     }
-    debug("触发保存任务, 将在3分钟后保存")
+    debug(() => "触发保存任务, 将在3分钟后保存")
     this.saveTask = setTimeout(() => {
       this.saveTask = null;
       this.beforeSave();

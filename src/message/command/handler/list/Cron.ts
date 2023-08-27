@@ -1,14 +1,19 @@
-import {CommandHandlerType} from "@/message/command/handler/CommandHandler";
+import {CommandType} from "@/message/command/handler/CommandHandler";
 import type {Command} from "@/message/command/Command";
 import {CommandManager} from "@/message/command/CommandManager";
 import {ScheduleManager, ScheduleTask, ScheduleTaskType, SendMessageData} from "@/schedule/ScheduleManager";
 import {BaseSubCommand} from "@/message/command/handler/template/BaseSubCommand";
 import {SubHandler} from "@/message/command/handler/template/SubHandler";
+import {buildCommand} from "@/message/command/handler/builder/BuildCommand";
+import {PermValue} from "@/permission/types";
+import {CommandArgValidation} from "@/message/command/handler/builder/CommandArgValidation";
+import {ConvertResult} from "@/message/command/handler/builder/ConvertResult";
+import {any} from "@/util/collection";
 
 class Cron extends BaseSubCommand {
   name = "Cron";
   regex = /cron/i;
-  type = CommandHandlerType.ALL;
+  type = CommandType.ROOM_AND_PRIVATE;
   permission = ["command.use.Cron"];
   sub: SubHandler[] = [
     new class extends SubHandler {
@@ -90,3 +95,47 @@ cron表达式参考 https://github.com/node-schedule/node-schedule`
 
 const INSTANCE = new Cron();
 CommandManager.register(INSTANCE, INSTANCE.type);
+
+buildCommand("cron", /cron/i, CommandType.ROOM_AND_PRIVATE)
+  .perm(PermValue.TRUE)
+  // add {group} {perm}
+  .sub(buildCommand("add", /add/i)
+    .valid([
+      new class implements CommandArgValidation<any> {
+        name: "权限组名字";
+        require: true;
+        checkConvert(arg: string): ConvertResult<string> {
+          if (arg.isBlank()) return ConvertResult.fail("权限组名字不可为空");
+          // 默认权限组
+          if (arg === "*.*") return ConvertResult.success(arg);
+          let split = arg.split(".");
+          if (split.length > 2) return ConvertResult.fail("权限组名字不可包含超过两个'.'");
+          if (split[0].isBlank() || split[1].isBlank()) return ConvertResult.fail("权限组名字中.字符不可位于首尾");
+          if (!arg.match(/[a-z\\d.*_-]+/i)) return ConvertResult.fail("权限组名字仅可由大小写字母, 阿拉伯数字, .*_-字符组成");
+          return ConvertResult.success(arg);
+        }
+      },
+      new class implements CommandArgValidation<any> {
+        name: "权限节点名字";
+        require: true;
+        checkConvert(arg: string): ConvertResult<string> {
+          if (arg.isBlank()) return ConvertResult.fail("权限节点名字不可为空");
+          let split = arg.split(".");
+          if (any(split, s => s.isBlank())) return ConvertResult.fail("权限节点名字中不可有两个连续的.字符");
+          split = arg.split("*");
+          if (split.length > 2) return ConvertResult.fail("权限节点名字中不可有超过一个*字符存在");
+          if (split.length === 2) {
+            if (!split[split.length - 1].isBlank()) return ConvertResult.fail("权限节点名字中*字符之后不可有其他内容");
+            split[split.length - 2]
+          }
+          if (!arg.match(/[a-z\\d_.-]+/i)) return ConvertResult.fail("权限节点名字仅可由大小写字母, 阿拉伯数字, _-.字符组成");
+          return ConvertResult.success(arg);
+        }
+      },
+    ])
+    .onCommand((handler, command, arg, args) => {
+
+    })
+    .build()
+  )
+  .register()

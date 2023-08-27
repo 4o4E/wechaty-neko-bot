@@ -1,4 +1,4 @@
-import {CommandHandler, CommandHandlerType} from "@/message/command/handler/CommandHandler";
+import {CommandHandler, CommandType} from "@/message/command/handler/CommandHandler";
 import type {Command} from "@/message/command/Command";
 import axios, {AxiosRequestConfig, HttpStatusCode} from "axios";
 import {FileBox} from "file-box";
@@ -10,7 +10,7 @@ export abstract class SingleImageApiTemplate implements CommandHandler {
   abstract name: string;
   abstract regex: RegExp;
   abstract usage: string;
-  abstract type: CommandHandlerType;
+  abstract type: CommandType;
   abstract permission: string[];
 
   /**

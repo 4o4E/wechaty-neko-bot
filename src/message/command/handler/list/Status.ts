@@ -1,4 +1,4 @@
-import {CommandHandler, CommandHandlerType} from "@/message/command/handler/CommandHandler";
+import {CommandHandler, CommandType} from "@/message/command/handler/CommandHandler";
 import type {Command} from "@/message/command/Command";
 import {CommandManager} from "@/message/command/CommandManager";
 import {start} from "@/main";
@@ -7,7 +7,7 @@ class Status implements CommandHandler {
   name = "Status";
   regex = /status|e/i;
   usage = "!status - 查看机器人统计信息";
-  type = CommandHandlerType.ALL;
+  type = CommandType.ROOM_AND_PRIVATE;
   permission = ["command.use.Status"];
 
   onCommand(command: Command): void {
