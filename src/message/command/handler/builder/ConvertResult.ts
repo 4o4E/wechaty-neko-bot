@@ -1,3 +1,6 @@
+/**
+ * 校验和转换的结果
+ */
 export class ConvertResult<T> {
   /**
    * 检查时出现的异常

@@ -223,13 +223,13 @@ export class CommandManager {
           status.status = ParseStatus.SPACING;
           return;
         case ParseStatus.KEY:
-          _result.props.set(cache.key.join(''), '')
+          _result.props.set(cache.key.join('').toLowerCase(), '')
           cache.key = [];
           cache.value = [];
           status.status = ParseStatus.SPACING;
           return;
         case ParseStatus.VALUE:
-          _result.props.set(cache.key.join(''), cache.value.join(''))
+          _result.props.set(cache.key.join('').toLowerCase(), cache.value.join('').toLowerCase())
           cache.key = [];
           cache.value = [];
           status.status = ParseStatus.SPACING;
@@ -247,7 +247,6 @@ export class CommandManager {
       // console.log()
       const prev = () => text.charAt(i - 1);
       const next = () => text.charAt(i + 1);
-
       const push = () => {
         switch (status.status) {
           case ParseStatus.ARGUMENT:

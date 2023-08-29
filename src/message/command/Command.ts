@@ -26,7 +26,7 @@ export class Command {
   /**
    * 指令的选项, -aaa=bbb
    */
-  props: Map<string, string>
+  options: Map<string, string>
   /**
    * 指令body原文
    */
@@ -37,14 +37,14 @@ export class Command {
     sender: ContactInterface,
     name: string,
     args: string[],
-    props: Map<string, string>,
+    options: Map<string, string>,
     content: string
   ) {
     this.message = message;
     this.sender = sender;
     this.name = name;
     this.args = args;
-    this.props = props;
+    this.options = options;
     this.content = content;
   }
 
@@ -52,12 +52,10 @@ export class Command {
    * 返回可视化的指令解析结果
    */
   toString() {
-    return `command { name: ${this.name}, args: ${this.args}, options: ${JSON.stringify(this.props)} }`
+    return `command { name: ${this.name}, args: ${this.args}, options: ${JSON.stringify(this.options)} }`
   }
 
-  async say(
-    sayable: Sayable
-  ): Promise<void | MessageInterface> {
+  async say(sayable: Sayable): Promise<void | MessageInterface> {
     return this.message.say(sayable)
   }
 }

@@ -21,9 +21,9 @@ class Wakatime implements CommandHandler {
       command.message.say(this.usage);
       return;
     }
-    let theme = command.props.get("theme") ?? "tokyonight";
-    let range = command.props.get("range") ?? "7d";
-    let type = command.props.get("t")?.toLocaleLowerCase() ?? 'lang';
+    let theme = command.options.get("theme") ?? "tokyonight";
+    let range = command.options.get("range") ?? "7d";
+    let type = command.options.get("t")?.toLocaleLowerCase() ?? 'lang';
     if (type != 'lang' && type != 'editor') {
       command.message.say(this.usage);
       return;
