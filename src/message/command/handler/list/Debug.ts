@@ -6,7 +6,7 @@ import {command} from "@/message/command/handler/builder/CommandBuilder";
 command("debug", /debug/i, CommandType.ROOM_AND_PRIVATE)
   .perm(PermValue.ADMIN)
   .usage("切换debug")
-  .onCommand((_, command) => {
+  .onCommand(async (_, command) => {
     switchDebug();
-    command.say(enableDebug ? "已开启debug" : "已关闭debug");
+    await command.say(enableDebug ? "已开启debug" : "已关闭debug");
   }).register();

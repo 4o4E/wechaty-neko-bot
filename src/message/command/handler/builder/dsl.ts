@@ -9,22 +9,22 @@ command("example", /example/i, CommandType.ROOM_AND_PRIVATE)
   .perm(PermValue.ADMIN)
   // example action1
   .sub(subCommand("action1", /action1/i)
-    .onCommand((_handler, command) => {
-      command.say("result1");
+    .onCommand(async (_handler, command) => {
+      await command.say("result1");
     })
     .build()
   )
   // example action2
   .sub(subCommand("action2", /action2/i)
-    .onCommand((_handler, command) => {
-      command.say("result2");
+    .onCommand(async (_handler, command) => {
+      await command.say("result2");
     })
     .build()
   )
   // example action a|b|c {number}
   .sub(subCommand("action", /action/i)
     .valid([
-      new ArgInfo<string>(
+      new ArgInfo(
         "arg1",
         "a|b|c",
         true,
@@ -39,7 +39,7 @@ command("example", /example/i, CommandType.ROOM_AND_PRIVATE)
         }
       }
       ),
-      new ArgInfo<string>(
+      new ArgInfo(
         "number",
         "require number",
         true,
@@ -50,15 +50,15 @@ command("example", /example/i, CommandType.ROOM_AND_PRIVATE)
       }
       ),
     ])
-    .onCommand((handler, command, _arg, args) => {
+    .onCommand(async (handler, command, _arg, args) => {
       // 检查args
       let processedArgs = handler.processArgs(args);
       if (typeof processedArgs === "string") {
-        command.say(processedArgs);
+        await command.say(processedArgs);
         return;
       }
       let [action, number] = processedArgs;
-      command.say(`${action}: ${number}`);
+      await command.say(`${action}: ${number}`);
     })
     .build()
   )

@@ -98,7 +98,7 @@ export class CommandManager {
     log.info(PREFIX, "recv private: %s", command.toString())
     for (const handler of this.private) {
       if (!handler.regex.test(command.name)) continue;
-      handler.onCommand(command, command.name, Array.from(command.args));
+      handler.onCommand(handler, command, command.name, Array.from(command.args));
       return true;
     }
     return false;
@@ -113,7 +113,7 @@ export class CommandManager {
     log.info(PREFIX, "recv group: %s", command.toString())
     for (const handler of this.group) {
       if (!handler.regex.test(command.name)) continue;
-      handler.onCommand(command, command.name, Array.from(command.args));
+      handler.onCommand(handler, command, command.name, Array.from(command.args));
       return true;
     }
     return false;

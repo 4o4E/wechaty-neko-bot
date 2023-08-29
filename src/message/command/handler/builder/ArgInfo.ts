@@ -3,7 +3,7 @@ import {ConvertResult} from "@/message/command/handler/builder/ConvertResult";
 /**
  * 参数信息
  */
-export class ArgInfo<T extends Object> {
+export class ArgInfo {
   /**
    * 参数名字
    */
@@ -25,10 +25,10 @@ export class ArgInfo<T extends Object> {
    * @param arg 输入的参数
    * @return 若没有问题则输出null, 否则输出错误信息
    */
-  checkConvert: (arg: string) => ConvertResult<T>;
+  checkConvert: (arg: string) => ConvertResult;
 
 
-  constructor(name: string, desc: string, require: boolean, checkConvert: (arg: string) => ConvertResult<T>) {
+  constructor(name: string, desc: string, require: boolean, checkConvert: (arg: string) => ConvertResult) {
     this.name = name;
     this.desc = desc;
     this.require = require;

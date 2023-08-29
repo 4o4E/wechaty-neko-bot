@@ -2,14 +2,15 @@ import fs from "fs";
 import {
   DEFAULT_GROUP_WEIGHT,
   deserializeToTree,
-  PermNode,
-  PermTree, PermValue,
+  PermValue,
   serializeFromTree,
 } from "@/permission/types";
 import * as path from "path";
 import {mkdirs, safeWrite} from "@/util/path";
 import {Savable} from "@/config/Savable";
 import {debug} from "@/util/log";
+import {PermTree} from "@/permission/PermTree";
+import {PermNode} from "@/permission/PermNode";
 
 /**
  * # 存储结构
@@ -202,31 +203,30 @@ class _PermManager extends Savable {
    * 检查权限组名字, 并通过权限组名字推断其权重
    *
    * @param input 权限组名字
-   * @return 权重, 若权限组名字不合法则返回null
+   * @return 权重, 若权限组名字不合法则返回错误信息
    */
-  checkPermGroupName(input: string): number | null {
+  checkPermGroupName(input: string): { name: string, weight: number } | string {
+    if (input.isBlank()) return "权限组名字不可为空";
     let split = input.split(".");
     // 包含多个.
-    if (split.length > 2) return null;
+    if (split.length > 2) return "权限组名字中不可包含多个.字符";
     // 群权限
     if (split.length === 2) {
       let [gid, uid] = split;
-      if (gid === "" || uid === "") return null;
-      if (gid === "*" && uid === "*") return DEFAULT_GROUP_WEIGHT.DEFAULT;
-      if (gid === "*") return DEFAULT_GROUP_WEIGHT.MEMBER_IN_ALL_ROOM;
-      if (uid === "*") return DEFAULT_GROUP_WEIGHT.ALL_MEMBER_IN_ROOM;
-      return DEFAULT_GROUP_WEIGHT.MEMBER_IN_ROOM;
+      if (gid === "" || uid === "") return "权限组名字中.字符不可在首尾";
+      if (gid === "*" && uid === "*") return {name: input, weight: DEFAULT_GROUP_WEIGHT.DEFAULT};
+      if (gid === "*") return {name: input, weight: DEFAULT_GROUP_WEIGHT.MEMBER_IN_ALL_ROOM};
+      if (uid === "*") return {name: input, weight: DEFAULT_GROUP_WEIGHT.ALL_MEMBER_IN_ROOM};
+      return {name: input, weight: DEFAULT_GROUP_WEIGHT.MEMBER_IN_ROOM};
     }
     // 成员权限
-    let [uid] = split;
-    if (uid === "") return null;
-    return DEFAULT_GROUP_WEIGHT.USER;
+    return {name: input, weight: DEFAULT_GROUP_WEIGHT.USER};
   }
 
   setPerm(id: string, weight: number, perm: string, value: PermValue): PermNode {
     let tree = this.group[id];
     if (!tree) {
-      tree = new PermTree(id, [], this.checkPermGroupName(id));
+      tree = new PermTree(id, [], weight);
       this.group[id] = tree;
     }
     let node = tree.getOrBuild(perm.split("."));

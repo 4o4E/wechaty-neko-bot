@@ -3,7 +3,7 @@ import {ConvertResult} from "@/message/command/handler/builder/ConvertResult";
 /**
  * 对指令选项的校验
  */
-export interface OptionInfo<T> {
+export interface OptionInfo {
   /**
    * 参数key名字
    */
@@ -35,5 +35,5 @@ export interface OptionInfo<T> {
    * @param value 输入的value
    * @return 若没有问题则输出转换结果, 否则输出错误信息
    */
-  checkConvert(value: string): ConvertResult<T>;
+  checkConvert(value: string): ConvertResult;
 }

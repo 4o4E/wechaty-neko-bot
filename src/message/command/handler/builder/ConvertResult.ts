@@ -1,7 +1,7 @@
 /**
  * 校验和转换的结果
  */
-export class ConvertResult<T> {
+export class ConvertResult {
   /**
    * 检查时出现的异常
    */
@@ -9,9 +9,9 @@ export class ConvertResult<T> {
   /**
    * 转换的结果
    */
-  result: T | null;
+  result: any | null;
 
-  static success<T>(result: T) {
+  static success(result: any) {
     return new ConvertResult(null, result);
   }
 
@@ -19,7 +19,7 @@ export class ConvertResult<T> {
     return new ConvertResult(error, null);
   }
 
-  private constructor(error: string | null, result: T | null) {
+  private constructor(error: string | null, result: any) {
     this.error = error;
     this.result = result;
   }

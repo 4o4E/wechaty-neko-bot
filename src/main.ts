@@ -1,6 +1,4 @@
 // 防止@路径被编译进js
-import * as path from "path";
-
 require("module-alias/register");
 
 import {Contact, log, Message, ScanStatus, WechatyBuilder} from 'wechaty'
@@ -10,6 +8,7 @@ import {MessageManager} from "@/message/MessageManager";
 import {CommandManager} from "@/message/command/CommandManager";
 import {ScheduleManager} from "@/schedule/ScheduleManager";
 import {PermManager} from "@/permission/PermManager";
+import * as path from "path";
 
 export const workingDir = process.cwd();
 

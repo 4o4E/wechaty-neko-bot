@@ -1,34 +1,34 @@
-import {CommandHandler, CommandType} from "@/message/command/handler/CommandHandler";
-import type {Command} from "@/message/command/Command";
-import {CommandManager} from "@/message/command/CommandManager";
-import {enableDebug, switchDebug} from "@/util/log";
-import {BaseSubCommand} from "@/message/command/handler/template/BaseSubCommand";
-import {SubHandler} from "@/message/command/handler/template/SubHandler";
+import {CommandType} from "@/message/command/handler/CommandHandler";
+import {command, subCommand} from "@/message/command/handler/builder/CommandBuilder";
+import {ArgInfo} from "@/message/command/handler/builder/ArgInfo";
+import {PermValue} from "@/permission/types";
+import {ConvertResult} from "@/message/command/handler/builder/ConvertResult";
+import {PermManager} from "@/permission/PermManager";
 
-class Permission extends BaseSubCommand {
-  override sub: SubHandler[] = (() => {
-    let arr = [
-      new class extends SubHandler {
-        name: string;
-        permission: Array<string>;
-        regex: RegExp;
-        usage: string;
-
-        onSubCommand(command: Command, arg: string, args: string[]) {
-        }
+command("perm", /perm|permission/i, CommandType.ROOM_AND_PRIVATE)
+  // perm list {group-name}
+  .sub(subCommand("list", /list|l/i)
+    .perm(PermValue.ADMIN)
+    .arg([
+      new ArgInfo("group", "权限组名字", true, (arg) => {
+        let result = PermManager.checkPermGroupName(arg);
+        if (typeof result === "string") return ConvertResult.fail(result);
+        return ConvertResult.success(result.name);
+      })
+    ])
+    .onCommand(async (handler, c, arg, args) => {
+      let [name] = args;
+      let tree = PermManager.group[name];
+      if (!tree) {
+        await c.say(`没有名为${name}的权限组`);
+        return;
       }
-    ];
-    for (let handler of arr) {
-      handler.parent = this;
-    }
-    return arr
-  })();
-  name = "Permission";
-  regex = /perm(permission)?/i;
-  type = CommandType.ROOM_AND_PRIVATE;
-  usage = this.generateUsage();
-  permission = [];
-}
-
-const INSTANCE = new Permission();
-CommandManager.register(INSTANCE, INSTANCE.type);
+      let result = new Array<string>();
+      tree.getAll().forEach(node => result.push(
+        "\n", node.path, ": ", PermValue[node.value],
+        "(", node.weight.toString(), ")"
+      ));
+      await c.say(result.join("").substring(1));
+    })
+    .build()
+  )

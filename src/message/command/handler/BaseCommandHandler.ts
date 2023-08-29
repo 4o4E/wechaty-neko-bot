@@ -32,11 +32,11 @@ export abstract class BaseCommandHandler {
    *
    * 若`supportVararg`为`false`, 则数量应大于等于输入的参数个数, 超过个数则视为错误输入
    */
-  argsInfo: ArgInfo<any>[] = [];
+  argsInfo: ArgInfo[] = [];
   /**
    * 指令选项信息
    */
-  optionsInfo: Map<string, OptionInfo<any>> = new Map<string, OptionInfo<any>>();
+  optionsInfo: Map<string, OptionInfo> = new Map<string, OptionInfo>();
   /**
    * 是否支持可变长参数, 若支持, 则参数校验器中的最后一个校验器将用于后续可变参数的校验
    */
@@ -64,7 +64,7 @@ export abstract class BaseCommandHandler {
    * @param args 还未处理的参数
    * @return 若找到合适的处理器处理则返回true
    */
-  trySubCommand(handler: BaseCommandHandler, command: Command, thisArg: string, args: string[]): void {
+  async trySubCommand(handler: BaseCommandHandler, command: Command, thisArg: string, args: string[]): Promise<void> {
     let arg = args.shift();
     if (command.args.length !== 0) {
       for (let handler of this.sub) {
@@ -78,7 +78,7 @@ export abstract class BaseCommandHandler {
       this.onCommand(handler, command, arg, args);
       return;
     }
-    command.say(this.usage);
+    await command.say(this.usage);
   }
 
   /**

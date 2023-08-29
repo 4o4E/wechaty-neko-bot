@@ -38,7 +38,7 @@ export class CommandBuilder {
    *
    * @param info 参数信息
    */
-  arg(info: ArgInfo<any>) {
+  arg(info: ArgInfo) {
     this.handler.argsInfo.push(info);
     return this;
   }
@@ -48,7 +48,7 @@ export class CommandBuilder {
    *
    * @param info 选项信息
    */
-  option(info: OptionInfo<any>) {
+  option(info: OptionInfo) {
     this.handler.optionsInfo.set(info.name, info);
     return this;
   }
@@ -78,7 +78,7 @@ export class CommandBuilder {
    *
    * @param valid 参数校验器数组
    */
-  valid(valid: ArgInfo<any>[]): CommandBuilder {
+  valid(valid: ArgInfo[]): CommandBuilder {
     this.handler.argsInfo = valid;
     return this;
   }
@@ -138,12 +138,12 @@ export class SubCommandBuilder {
   }
 
   /**
-   * 添加一个参数信息
+   * 设置参数信息
    *
    * @param info 参数信息
    */
-  arg(info: ArgInfo<any>): SubCommandBuilder {
-    this.handler.argsInfo.push(info);
+  arg(info: ArgInfo[]): SubCommandBuilder {
+    this.handler.argsInfo = info;
     return this;
   }
 
@@ -152,7 +152,7 @@ export class SubCommandBuilder {
    *
    * @param info 选项信息
    */
-  option(info: OptionInfo<any>): SubCommandBuilder {
+  option(info: OptionInfo): SubCommandBuilder {
     this.handler.optionsInfo.set(info.name, info);
     return this;
   }
@@ -182,7 +182,7 @@ export class SubCommandBuilder {
    *
    * @param valid 参数校验器数组
    */
-  valid(valid: ArgInfo<any>[]): SubCommandBuilder {
+  valid(valid: ArgInfo[]): SubCommandBuilder {
     this.handler.argsInfo = valid;
     return this;
   }
@@ -293,7 +293,7 @@ export class SubCommandBuilder {
   }
 }
 
-export function command(name: string, regex: RegExp, type?: CommandType): CommandBuilder {
+export function command(name: string, regex: RegExp, type: CommandType): CommandBuilder {
   return new CommandBuilder(name, regex, type);
 }
 
